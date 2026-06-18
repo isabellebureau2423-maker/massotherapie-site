@@ -73,7 +73,7 @@
               </div>
               <div class="confirm-row">
                 <span>⏱️ Durée</span>
-                <strong><span id="confirmDuree"></span> minutes</strong>
+                <strong id="confirmDuree"></strong>
               </div>
             </div>
             <p class="confirm-email-note">
@@ -144,10 +144,39 @@
             </div>
           </div>
 
-          <!-- STEP 2 : Date -->
-          <div class="res-step" id="step3">
+          <!-- STEP 2 : Durée -->
+          <div class="res-step" id="stepDuree">
             <div class="res-step__header">
               <span class="step-tag">Étape 2</span>
+              <h2 class="step-title">Durée de la séance</h2>
+            </div>
+            <p class="step-error" id="stepDureeError" hidden></p>
+            <div class="duree-cards">
+              <label class="duree-card">
+                <input type="radio" name="duree" value="60" />
+                <div class="duree-card__inner">
+                  <span class="duree-card__min">60</span>
+                  <span class="duree-card__label">minutes</span>
+                  <span class="duree-card__prix">90 $</span>
+                  <span class="duree-card__taxes">+ taxes</span>
+                </div>
+              </label>
+              <label class="duree-card">
+                <input type="radio" name="duree" value="90" />
+                <div class="duree-card__inner">
+                  <span class="duree-card__min">90</span>
+                  <span class="duree-card__label">minutes</span>
+                  <span class="duree-card__prix">125 $</span>
+                  <span class="duree-card__taxes">+ taxes</span>
+                </div>
+              </label>
+            </div>
+          </div>
+
+          <!-- STEP 3 : Date -->
+          <div class="res-step" id="step3">
+            <div class="res-step__header">
+              <span class="step-tag">Étape 3</span>
               <h2 class="step-title">Choisir une date</h2>
             </div>
             <p class="step-hint">Disponible : lundi, mardi, mercredi et weekends disponibles.</p>
@@ -166,10 +195,10 @@
             </div>
           </div>
 
-          <!-- STEP 3 : Heure -->
+          <!-- STEP 4 : Heure -->
           <div class="res-step" id="step4" hidden>
             <div class="res-step__header">
-              <span class="step-tag">Étape 3</span>
+              <span class="step-tag">Étape 4</span>
               <h2 class="step-title">Choisir une heure</h2>
             </div>
             <p class="step-error" id="step4Error" hidden></p>
@@ -347,9 +376,14 @@
     }
 
     // ===== FETCH SLOTS =====
-    const DUREE_DEFAULT = 60;
+    function getSelectedDuree() {
+      const el = document.querySelector('input[name="duree"]:checked');
+      return el ? parseInt(el.value) : null;
+    }
+
     async function fetchSlots() {
       if (!selectedDate) return;
+      const duree = getSelectedDuree() || 60;
 
       const step4   = document.getElementById('step4');
       const spinner = document.getElementById('slotsSpinner');
@@ -362,7 +396,7 @@
       setTimeout(() => step4.scrollIntoView({ behavior: 'smooth', block: 'start' }), 80);
 
       try {
-        const res  = await fetch(`/.netlify/functions/get-availability?date=${selectedDate}&duree=${DUREE_DEFAULT}`);
+        const res  = await fetch(`/.netlify/functions/get-availability?date=${selectedDate}&duree=${duree}`);
         const data = await res.json();
         spinner.hidden = true;
 
@@ -451,6 +485,14 @@
       }
       clearStepError('stepSoinError');
 
+      const dureeVal = getSelectedDuree();
+      if (!dureeVal) {
+        showStepError('stepDureeError', 'Veuillez choisir une durée.');
+        document.getElementById('stepDuree').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        return;
+      }
+      clearStepError('stepDureeError');
+
       if (!selectedDate) {
         showStepError('step3Error', 'Veuillez choisir une date.');
         document.getElementById('step3').scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -468,13 +510,14 @@
       submitBtn.disabled  = true;
       submitSpin.hidden   = false;
 
+      const prixMap = { 60: '90 $', 90: '125 $' };
       const payload = {
         prenom:    prenomVal,
         nom:       '',
         telephone: '',
         courriel:  courrielVal,
         service:   serviceVal,
-        duree:     DUREE_DEFAULT,
+        duree:     dureeVal,
         date:      selectedDate,
         heure:     selectedTime,
       };
@@ -504,7 +547,7 @@
         document.getElementById('confirmSoin').textContent     = payload.service;
         document.getElementById('confirmDate').textContent     = dateFormatted;
         document.getElementById('confirmHeure').textContent    = selectedTime;
-        document.getElementById('confirmDuree').textContent    = payload.duree;
+        document.getElementById('confirmDuree').textContent    = `${payload.duree} min — ${prixMap[payload.duree] || ''} + taxes`;
         document.getElementById('confirmCourriel').textContent = payload.courriel;
 
         document.getElementById('bookingForm').hidden = true;
@@ -533,7 +576,6 @@
       renderCalendar();
     });
 
-    // Re-fetch if duration changes after date selected
     document.querySelectorAll('input[name="duree"]').forEach(radio => {
       radio.addEventListener('change', () => { if (selectedDate) fetchSlots(); });
     });

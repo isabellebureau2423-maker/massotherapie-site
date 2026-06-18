@@ -150,6 +150,70 @@
   box-shadow: 0 0 0 3px rgba(192,57,43,0.1) !important;
 }
 
+/* ===== DURATION CARDS ===== */
+.duree-cards {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+.duree-card input { display: none; }
+
+.duree-card { display: block; cursor: pointer; }
+
+.duree-card__inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 24px 16px;
+  border: 2px solid rgba(42,84,70,0.3);
+  border-radius: var(--radius);
+  background: rgba(42,84,70,0.06);
+  text-align: center;
+  transition: var(--transition);
+}
+
+.duree-card__inner:hover { border-color: var(--color-accent); }
+
+.duree-card input:checked + .duree-card__inner {
+  border-color: var(--color-primary);
+  background: rgba(184,146,42,0.08);
+  box-shadow: 0 4px 16px rgba(184,146,42,0.2);
+}
+
+.duree-card__min {
+  font-family: var(--font-heading);
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--color-dark);
+  line-height: 1;
+}
+
+.duree-card__label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-text-light);
+}
+
+.duree-card__prix {
+  margin-top: 8px;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--color-primary);
+}
+
+.duree-card__taxes {
+  font-size: 0.75rem;
+  color: var(--color-text-light);
+}
+
+@media (max-width: 480px) {
+  .duree-cards { grid-template-columns: 1fr; }
+}
+
 /* ===== CALENDAR ===== */
 .calendar {
   border-radius: var(--radius-lg);
