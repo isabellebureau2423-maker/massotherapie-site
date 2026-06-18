@@ -60,6 +60,10 @@
             </p>
             <div class="confirm-summary">
               <div class="confirm-row">
+                <span>🤲 Soin</span>
+                <strong id="confirmSoin"></strong>
+              </div>
+              <div class="confirm-row">
                 <span>📅 Date</span>
                 <strong id="confirmDate"></strong>
               </div>
@@ -87,10 +91,63 @@
         <!-- BOOKING FORM -->
         <form class="booking-form" id="bookingForm" novalidate>
 
-          <!-- STEP 1 : Date -->
-          <div class="res-step" id="step3">
+          <!-- STEP 1 : Soin -->
+          <div class="res-step" id="stepSoin">
             <div class="res-step__header">
               <span class="step-tag">Étape 1</span>
+              <h2 class="step-title">Type de soin</h2>
+            </div>
+            <p class="step-error" id="stepSoinError" hidden></p>
+            <div class="service-list" id="serviceList">
+              <label class="service-option">
+                <input type="radio" name="service" value="Ventouses" />
+                <div class="service-option__inner">
+                  <strong>Ventouses</strong>
+                  <span>Décompression des tissus, amélioration de la circulation et relâchement des tensions en profondeur.</span>
+                </div>
+              </label>
+              <label class="service-option">
+                <input type="radio" name="service" value="Drainage lymphatique" />
+                <div class="service-option__inner">
+                  <strong>Drainage lymphatique</strong>
+                  <span>Stimulation douce du système lymphatique pour réduire l'œdème et favoriser la détoxification.</span>
+                </div>
+              </label>
+              <label class="service-option">
+                <input type="radio" name="service" value="Massage sportif" />
+                <div class="service-option__inner">
+                  <strong>Massage sportif</strong>
+                  <span>Préparation musculaire et récupération après l'effort — idéal pour les athlètes et sportifs actifs.</span>
+                </div>
+              </label>
+              <label class="service-option">
+                <input type="radio" name="service" value="Massage de détente" />
+                <div class="service-option__inner">
+                  <strong>Massage de détente</strong>
+                  <span>Relaxation profonde du corps et de l'esprit pour libérer le stress et améliorer le bien-être général.</span>
+                </div>
+              </label>
+              <label class="service-option">
+                <input type="radio" name="service" value="Massage thérapeutique" />
+                <div class="service-option__inner">
+                  <strong>Massage thérapeutique</strong>
+                  <span>Traitement ciblé des douleurs chroniques, blessures et contractures musculaires.</span>
+                </div>
+              </label>
+              <label class="service-option">
+                <input type="radio" name="service" value="Massage en profondeur" />
+                <div class="service-option__inner">
+                  <strong>Massage en profondeur</strong>
+                  <span>Travail ciblé sur les nœuds et tensions musculaires chroniques pour restaurer mobilité et confort.</span>
+                </div>
+              </label>
+            </div>
+          </div>
+
+          <!-- STEP 2 : Date -->
+          <div class="res-step" id="step3">
+            <div class="res-step__header">
+              <span class="step-tag">Étape 2</span>
               <h2 class="step-title">Choisir une date</h2>
             </div>
             <p class="step-hint">Disponible : lundi, mardi, mercredi et weekends disponibles.</p>
@@ -109,10 +166,10 @@
             </div>
           </div>
 
-          <!-- STEP 2 : Heure -->
+          <!-- STEP 3 : Heure -->
           <div class="res-step" id="step4" hidden>
             <div class="res-step__header">
-              <span class="step-tag">Étape 2</span>
+              <span class="step-tag">Étape 3</span>
               <h2 class="step-title">Choisir une heure</h2>
             </div>
             <p class="step-error" id="step4Error" hidden></p>
@@ -386,6 +443,14 @@
       } else { courrielErr.hidden = true; document.getElementById('courriel').classList.remove('input--error'); }
       if (!formValid) return;
 
+      const serviceVal = document.querySelector('input[name="service"]:checked')?.value || '';
+      if (!serviceVal) {
+        showStepError('stepSoinError', 'Veuillez choisir un type de soin.');
+        document.getElementById('stepSoin').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        return;
+      }
+      clearStepError('stepSoinError');
+
       if (!selectedDate) {
         showStepError('step3Error', 'Veuillez choisir une date.');
         document.getElementById('step3').scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -408,6 +473,7 @@
         nom:       '',
         telephone: '',
         courriel:  courrielVal,
+        service:   serviceVal,
         duree:     DUREE_DEFAULT,
         date:      selectedDate,
         heure:     selectedTime,
@@ -434,10 +500,11 @@
 
         // SUCCESS
         const dateFormatted = formatDateFr(selectedDate);
-        document.getElementById('confirmPrenom').textContent  = payload.prenom;
-        document.getElementById('confirmDate').textContent    = dateFormatted;
-        document.getElementById('confirmHeure').textContent   = selectedTime;
-        document.getElementById('confirmDuree').textContent   = payload.duree;
+        document.getElementById('confirmPrenom').textContent   = payload.prenom;
+        document.getElementById('confirmSoin').textContent     = payload.service;
+        document.getElementById('confirmDate').textContent     = dateFormatted;
+        document.getElementById('confirmHeure').textContent    = selectedTime;
+        document.getElementById('confirmDuree').textContent    = payload.duree;
         document.getElementById('confirmCourriel').textContent = payload.courriel;
 
         document.getElementById('bookingForm').hidden = true;
