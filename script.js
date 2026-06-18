@@ -77,3 +77,14 @@ fadeEls.forEach(el => {
   el.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
   fadeObserver.observe(el);
 });
+
+// Scroll-to-top button
+const scrollTopBtn = document.getElementById('scrollTopBtn');
+if (scrollTopBtn) {
+  window.addEventListener('scroll', () => {
+    scrollTopBtn.classList.toggle('visible', window.scrollY > 400);
+  });
+  scrollTopBtn.addEventListener('click', () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+}

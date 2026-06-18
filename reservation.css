@@ -1,3 +1,10 @@
+/* ===== NAV HOME LINK ===== */
+.nav__home {
+  font-weight: 600;
+  color: var(--color-primary) !important;
+  letter-spacing: 0.01em;
+}
+
 /* ===== MINI HERO ===== */
 .res-hero {
   position: relative;
