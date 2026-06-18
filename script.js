@@ -81,9 +81,14 @@ fadeEls.forEach(el => {
 // Scroll-to-top button
 const scrollTopBtn = document.getElementById('scrollTopBtn');
 if (scrollTopBtn) {
-  window.addEventListener('scroll', () => {
-    scrollTopBtn.classList.toggle('visible', window.scrollY > 10);
-  });
+  function updateScrollBtn() {
+    const show = window.scrollY > 10;
+    scrollTopBtn.style.opacity = show ? '1' : '0';
+    scrollTopBtn.style.transform = show ? 'translateY(0)' : 'translateY(12px)';
+    scrollTopBtn.style.pointerEvents = show ? 'auto' : 'none';
+  }
+  window.addEventListener('scroll', updateScrollBtn);
+  updateScrollBtn();
   scrollTopBtn.addEventListener('click', () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   });
