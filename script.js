@@ -88,3 +88,45 @@ if (scrollTopBtn) {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   });
 }
+
+// ===== PLAGES HORAIRES AUTO =====
+(function generatePlages() {
+  const grid = document.getElementById('plagesGrid');
+  if (!grid) return;
+
+  const JOURS = ['Dimanche','Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi'];
+  const MOIS  = ['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'];
+  const SLOTS = ['8h00','9h30','11h00','12h30','14h00','15h30'];
+
+  // Référence : samedi 21 juin 2026 = 1er weekend disponible
+  const REF_SAT = new Date(2026, 5, 21);
+
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  // Lundi de la semaine courante
+  const dow = today.getDay();
+  const diffLundi = dow === 0 ? -6 : 1 - dow;
+  const lundi = new Date(today);
+  lundi.setDate(today.getDate() + diffLundi);
+
+  // Jours affichés : lun(+0), mar(+1), mer(+2), sam(+5), dim(+6)
+  const offsets = [0, 1, 2, 5, 6];
+  const jours = offsets.map(o => { const d = new Date(lundi); d.setDate(lundi.getDate() + o); return d; });
+
+  // Weekend dispo ? (alternance depuis REF_SAT)
+  const msWeek = 7 * 24 * 60 * 60 * 1000;
+  const semDiff = Math.round((jours[3] - REF_SAT) / msWeek);
+  const weekendDispo = semDiff % 2 === 0;
+
+  grid.innerHTML = jours.map((d, i) => {
+    const isWE = i >= 3;
+    const dispo = isWE ? weekendDispo : true;
+    const nom = JOURS[d.getDay()];
+    const date = d.getDate() + ' ' + MOIS[d.getMonth()];
+    if (!dispo) {
+      return `<div class="plage plage--ferme"><div class="plage__jour">${nom}</div><div class="plage__date">${date}</div><div class="plage__ferme-label">Fermé</div></div>`;
+    }
+    return `<div class="plage plage--dispo"><div class="plage__jour">${nom}</div><div class="plage__date">${date}</div><div class="plage__heures">${SLOTS.map(s => `<span class="plage__heure">${s}</span>`).join('')}</div></div>`;
+  }).join('');
+})();

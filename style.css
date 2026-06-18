@@ -1225,3 +1225,18 @@ a.coord-item:hover {
 .scroll-top-btn:hover {
   background: var(--color-primary);
 }
+
+/* ===== PLAGE FERMÉE ===== */
+.plage--ferme {
+  background: rgba(0,0,0,0.18);
+  border: 2px solid rgba(0,0,0,0.12);
+  opacity: 0.55;
+}
+
+.plage__ferme-label {
+  display: block;
+  color: rgba(255,255,255,0.55);
+  font-size: 0.9rem;
+  font-style: italic;
+  padding: 18px 0 4px;
+}
