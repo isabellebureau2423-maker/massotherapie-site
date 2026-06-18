@@ -131,6 +131,11 @@ ul { list-style: none; }
 
 .galerie__item:hover img { transform: scale(1.04); }
 
+.galerie__item--wide {
+  grid-column: 1 / -1;
+  aspect-ratio: 16 / 9;
+}
+
 @media (max-width: 768px) {
   .galerie__grid {
     grid-template-columns: 1fr;
