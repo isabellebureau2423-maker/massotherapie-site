@@ -311,15 +311,22 @@
 }
 
 .slot-pill:hover:not(:disabled) {
-  border-color: var(--color-accent);
-  background: rgba(42,84,70,0.16);
+  background-color: #2A5446;
+  color: white;
+  border-color: #2A5446;
+  cursor: pointer;
+  transform: scale(1.03);
+  transition: all 0.2s ease;
 }
 
 .slot-pill--unavailable {
-  background: rgba(0,0,0,0.03);
-  border-color: rgba(0,0,0,0.07);
-  color: #C0CEC9;
-  cursor: not-allowed;
+  background-color: #c8c8c8 !important;
+  color: #888888 !important;
+  border: 1px solid #b0b0b0 !important;
+  cursor: not-allowed !important;
+  opacity: 0.5 !important;
+  text-decoration: line-through !important;
+  pointer-events: none;
 }
 
 .slot-pill--selected {
