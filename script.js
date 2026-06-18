@@ -36,29 +36,6 @@ const observer = new IntersectionObserver((entries) => {
 
 sections.forEach(s => observer.observe(s));
 
-// Form submit — ouvre l'app SMS avec le message pré-rempli
-document.getElementById('contactForm').addEventListener('submit', (e) => {
-  e.preventDefault();
-  const prenom    = document.getElementById('prenom').value.trim();
-  const nom       = document.getElementById('nom').value.trim();
-  const telephone = document.getElementById('telephone').value.trim();
-  const dureeEl   = document.querySelector('input[name="duree"]:checked');
-  const serviceEl = document.querySelector('input[name="service"]:checked');
-  const message   = document.getElementById('message').value.trim();
-  const duree     = dureeEl ? dureeEl.value : '';
-  const service   = serviceEl ? serviceEl.value : '';
-
-  let sms = `Bonjour Isabelle, je suis ${prenom} ${nom}`;
-  if (telephone) sms += `, mon numéro : ${telephone}`;
-  if (duree)     sms += `. Durée : ${duree}`;
-  if (service)   sms += `. Service : ${service}`;
-  if (message)   sms += `. ${message}`;
-  sms += `. J'aimerais prendre rendez-vous.`;
-
-  const encoded = encodeURIComponent(sms);
-  window.location.href = `sms:+14389398359?body=${encoded}`;
-});
-
 // Fade-in animation on scroll
 const fadeEls = document.querySelectorAll('.service-card, .formation-card, .info-card, .coord-item, .valeur');
 const fadeObserver = new IntersectionObserver((entries) => {
