@@ -235,7 +235,11 @@
     // ===== CALENDAR STATE =====
     const MONTHS_FR = ['Janvier','Février','Mars','Avril','Mai','Juin',
                        'Juillet','Août','Septembre','Octobre','Novembre','Décembre'];
-    const ALLOWED_DAYS = new Set([1, 2, 3, 6]); // Lu Ma Me Sa
+    const ALLOWED_DAYS = new Set([0, 1, 2, 3, 6]); // Di Lu Ma Me Sa
+
+    // Référence : samedi 20 juin 2026 = 1er weekend disponible
+    const REF_SAT_WE = new Date(2026, 5, 20);
+    const MS_WEEK = 7 * 24 * 60 * 60 * 1000;
 
     const now = new Date();
     let calYear  = now.getFullYear();
@@ -249,8 +253,20 @@
       return d;
     }
 
+    function isWeekendDispo(date) {
+      const dow = date.getDay();
+      const sat = new Date(date);
+      sat.setDate(date.getDate() + (dow === 0 ? -1 : 6 - dow));
+      sat.setHours(0, 0, 0, 0);
+      const weeks = Math.round((sat - REF_SAT_WE) / MS_WEEK);
+      return weeks % 2 === 0;
+    }
+
     function isDisabled(date) {
-      return date < todayMidnight() || !ALLOWED_DAYS.has(date.getDay());
+      const dow = date.getDay();
+      if (date < todayMidnight() || !ALLOWED_DAYS.has(dow)) return true;
+      if (dow === 0 || dow === 6) return !isWeekendDispo(date);
+      return false;
     }
 
     function toDateStr(y, m, d) {
