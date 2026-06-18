@@ -87,69 +87,13 @@
         <!-- BOOKING FORM -->
         <form class="booking-form" id="bookingForm" novalidate>
 
-          <!-- STEP 1 -->
-          <div class="res-step" id="step1">
-            <div class="res-step__header">
-              <span class="step-tag">Étape 1</span>
-              <h2 class="step-title">Vos informations</h2>
-            </div>
-            <p class="step-error" id="step1Error" hidden></p>
-            <div class="form-row">
-              <div class="form-group">
-                <label for="prenom">Prénom *</label>
-                <input type="text" id="prenom" name="prenom" placeholder="Votre prénom" autocomplete="given-name" />
-                <p class="field-error" id="prenomError" hidden></p>
-              </div>
-              <div class="form-group">
-                <label for="nom">Nom *</label>
-                <input type="text" id="nom" name="nom" placeholder="Votre nom" autocomplete="family-name" />
-                <p class="field-error" id="nomError" hidden></p>
-              </div>
-            </div>
-            <div class="form-group">
-              <label for="telephone">Téléphone *</label>
-              <input type="tel" id="telephone" name="telephone" placeholder="(514) 000-0000" autocomplete="tel" />
-              <p class="field-error" id="telephoneError" hidden></p>
-            </div>
-            <div class="form-group">
-              <label for="courriel">Courriel *</label>
-              <input type="email" id="courriel" name="courriel" placeholder="votre@courriel.com" autocomplete="email" />
-              <p class="field-error" id="courrielError" hidden></p>
-            </div>
-          </div>
-
-          <!-- STEP 2 -->
-          <div class="res-step" id="step2">
-            <div class="res-step__header">
-              <span class="step-tag">Étape 2</span>
-              <h2 class="step-title">Type de séance</h2>
-            </div>
-            <p class="step-error" id="step2Error" hidden></p>
-            <div class="duree-grid">
-              <label class="duree-card">
-                <input type="radio" name="duree" value="60" />
-                <div class="duree-card__inner">
-                  <span class="duree-card__temps">60 min</span>
-                  <span class="duree-card__prix">90 $ + taxes</span>
-                </div>
-              </label>
-              <label class="duree-card">
-                <input type="radio" name="duree" value="90" />
-                <div class="duree-card__inner">
-                  <span class="duree-card__temps">90 min</span>
-                  <span class="duree-card__prix">125 $ + taxes</span>
-                </div>
-              </label>
-            </div>
-          </div>
-
-          <!-- STEP 3 -->
+          <!-- STEP 1 : Date -->
           <div class="res-step" id="step3">
             <div class="res-step__header">
-              <span class="step-tag">Étape 3</span>
+              <span class="step-tag">Étape 1</span>
               <h2 class="step-title">Choisir une date</h2>
             </div>
-            <p class="step-hint">Disponible : lundi, mardi, mercredi et samedi.</p>
+            <p class="step-hint">Disponible : lundi, mardi, mercredi et weekends disponibles.</p>
             <p class="step-error" id="step3Error" hidden></p>
             <div class="calendar">
               <div class="cal-header">
@@ -165,10 +109,10 @@
             </div>
           </div>
 
-          <!-- STEP 4 -->
+          <!-- STEP 2 : Heure -->
           <div class="res-step" id="step4" hidden>
             <div class="res-step__header">
-              <span class="step-tag">Étape 4</span>
+              <span class="step-tag">Étape 2</span>
               <h2 class="step-title">Choisir une heure</h2>
             </div>
             <p class="step-error" id="step4Error" hidden></p>
@@ -184,6 +128,18 @@
 
           <!-- SUBMIT -->
           <div class="res-step res-step--submit">
+            <div class="form-row" style="margin-bottom:16px;">
+              <div class="form-group">
+                <label for="prenom">Prénom *</label>
+                <input type="text" id="prenom" name="prenom" placeholder="Votre prénom" autocomplete="given-name" />
+                <p class="field-error" id="prenomError" hidden></p>
+              </div>
+              <div class="form-group">
+                <label for="courriel">Courriel *</label>
+                <input type="email" id="courriel" name="courriel" placeholder="votre@courriel.com" autocomplete="email" />
+                <p class="field-error" id="courrielError" hidden></p>
+              </div>
+            </div>
             <button type="submit" class="btn btn--primary btn--full" id="submitBtn">
               <span class="spinner spinner--sm" id="submitSpinner" hidden></span>
               Confirmer mon rendez-vous
@@ -205,7 +161,7 @@
       <div class="footer__links">
         <a href="index.html#apropos">À propos</a>
         <a href="index.html#horaire">Horaire</a>
-        <a href="index.html#contact">Contact</a>
+        <a href="reservation.html">Réserver</a>
       </div>
       <p class="footer__copy">&copy; 2025 · Tous droits réservés · Saint-Rémi, Québec</p>
     </div>
@@ -326,8 +282,6 @@
 
     // ===== DATE CLICK =====
     function handleDateClick(dateStr) {
-      if (!validateStep1()) return;
-      if (!validateStep2()) return;
       clearStepError('step3Error');
       selectedDate = dateStr;
       selectedTime = null;
@@ -336,9 +290,9 @@
     }
 
     // ===== FETCH SLOTS =====
+    const DUREE_DEFAULT = 60;
     async function fetchSlots() {
-      const dureeEl = document.querySelector('input[name="duree"]:checked');
-      if (!dureeEl || !selectedDate) return;
+      if (!selectedDate) return;
 
       const step4   = document.getElementById('step4');
       const spinner = document.getElementById('slotsSpinner');
@@ -351,7 +305,7 @@
       setTimeout(() => step4.scrollIntoView({ behavior: 'smooth', block: 'start' }), 80);
 
       try {
-        const res  = await fetch(`/.netlify/functions/get-availability?date=${selectedDate}&duree=${dureeEl.value}`);
+        const res  = await fetch(`/.netlify/functions/get-availability?date=${selectedDate}&duree=${DUREE_DEFAULT}`);
         const data = await res.json();
         spinner.hidden = true;
 
@@ -390,43 +344,6 @@
       }
     }
 
-    // ===== VALIDATION =====
-    function validateStep1() {
-      clearStepError('step1Error');
-      const fields = [
-        { id: 'prenom',    msg: 'Le prénom est requis.' },
-        { id: 'nom',       msg: 'Le nom est requis.' },
-        { id: 'telephone', msg: 'Le téléphone est requis.' },
-        { id: 'courriel',  msg: 'Un courriel valide est requis.', check: v => v.includes('@') && v.includes('.') },
-      ];
-      let valid = true;
-      fields.forEach(({ id, msg, check }) => {
-        const input = document.getElementById(id);
-        const errEl = document.getElementById(`${id}Error`);
-        const val   = input.value.trim();
-        const ok    = val && (!check || check(val));
-        input.classList.toggle('input--error', !ok);
-        if (errEl) { errEl.textContent = ok ? '' : msg; errEl.hidden = ok; }
-        if (!ok) valid = false;
-      });
-      if (!valid) {
-        showStepError('step1Error', 'Veuillez compléter vos informations avant de choisir une date.');
-        document.getElementById('step1').scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }
-      return valid;
-    }
-
-    function validateStep2() {
-      const duree = document.querySelector('input[name="duree"]:checked');
-      if (!duree) {
-        showStepError('step2Error', 'Veuillez sélectionner une durée avant de choisir une date.');
-        document.getElementById('step2').scrollIntoView({ behavior: 'smooth', block: 'start' });
-        return false;
-      }
-      clearStepError('step2Error');
-      return true;
-    }
-
     function showStepError(id, msg) {
       const el = document.getElementById(id);
       if (el) { el.textContent = msg; el.hidden = false; }
@@ -451,8 +368,23 @@
       e.preventDefault();
       document.getElementById('formError').hidden = true;
 
-      if (!validateStep1()) return;
-      if (!validateStep2()) return;
+      // Validate inline fields
+      const prenomVal   = document.getElementById('prenom').value.trim();
+      const courrielVal = document.getElementById('courriel').value.trim();
+      let formValid = true;
+      const prenomErr   = document.getElementById('prenomError');
+      const courrielErr = document.getElementById('courrielError');
+      if (!prenomVal) {
+        prenomErr.textContent = 'Le prénom est requis.'; prenomErr.hidden = false;
+        document.getElementById('prenom').classList.add('input--error');
+        formValid = false;
+      } else { prenomErr.hidden = true; document.getElementById('prenom').classList.remove('input--error'); }
+      if (!courrielVal || !courrielVal.includes('@')) {
+        courrielErr.textContent = 'Un courriel valide est requis.'; courrielErr.hidden = false;
+        document.getElementById('courriel').classList.add('input--error');
+        formValid = false;
+      } else { courrielErr.hidden = true; document.getElementById('courriel').classList.remove('input--error'); }
+      if (!formValid) return;
 
       if (!selectedDate) {
         showStepError('step3Error', 'Veuillez choisir une date.');
@@ -465,7 +397,6 @@
         return;
       }
 
-      const dureeEl     = document.querySelector('input[name="duree"]:checked');
       const submitBtn   = document.getElementById('submitBtn');
       const submitSpin  = document.getElementById('submitSpinner');
 
@@ -473,11 +404,11 @@
       submitSpin.hidden   = false;
 
       const payload = {
-        prenom:    document.getElementById('prenom').value.trim(),
-        nom:       document.getElementById('nom').value.trim(),
-        telephone: document.getElementById('telephone').value.trim(),
-        courriel:  document.getElementById('courriel').value.trim(),
-        duree:     parseInt(dureeEl.value, 10),
+        prenom:    prenomVal,
+        nom:       '',
+        telephone: '',
+        courriel:  courrielVal,
+        duree:     DUREE_DEFAULT,
         date:      selectedDate,
         heure:     selectedTime,
       };
