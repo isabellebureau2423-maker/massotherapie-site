@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Réserver une séance — Kinésia Relief | Isabelle Bureau</title>
+  <meta name="description" content="Réservez votre séance de massothérapie ou kinésithérapie avec Isabelle Bureau — Kinésia Relief, Saint-Rémi." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="reservation.css" />
+</head>
+<body>
+
+  <!-- NAVIGATION -->
+  <header class="header" id="header">
+    <nav class="nav container">
+      <div class="nav__logo">
+        <img src="images/logo.png" alt="KinesiaRelief" class="nav__logo-img" />
+      </div>
+      <ul class="nav__links">
+        <li><a href="index.html#apropos">À propos</a></li>
+        <li><a href="index.html#informations">Informations</a></li>
+        <li><a href="index.html#disponibilites">Disponibilités</a></li>
+        <li><a href="index.html#horaire">Horaire</a></li>
+        <li><a href="reservation.html" class="btn btn--nav">Réserver</a></li>
+      </ul>
+      <button class="nav__burger" id="burger" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
+    </nav>
+  </header>
+
+  <!-- MINI HERO -->
+  <section class="res-hero">
+    <div class="res-hero__bg"></div>
+    <div class="container res-hero__content">
+      <p class="res-hero__tag">Réservation en ligne</p>
+      <h1 class="res-hero__title">Réserver une séance</h1>
+      <p class="res-hero__sub">Choisissez votre créneau en quelques secondes</p>
+    </div>
+  </section>
+
+  <!-- MAIN -->
+  <main class="res-main">
+    <div class="container">
+      <div class="res-wrapper">
+
+        <!-- CONFIRMATION CARD -->
+        <div class="confirm-card" id="confirmCard" hidden>
+          <div class="confirm-header">
+            <span class="confirm-icon">✅</span>
+            <h2 class="confirm-title">Rendez-vous confirmé !</h2>
+          </div>
+          <div class="confirm-body">
+            <p class="confirm-intro">
+              <strong id="confirmPrenom"></strong>, votre séance est réservée.
+            </p>
+            <div class="confirm-summary">
+              <div class="confirm-row">
+                <span>📅 Date</span>
+                <strong id="confirmDate"></strong>
+              </div>
+              <div class="confirm-row">
+                <span>🕐 Heure</span>
+                <strong id="confirmHeure"></strong>
+              </div>
+              <div class="confirm-row">
+                <span>⏱️ Durée</span>
+                <strong><span id="confirmDuree"></span> minutes</strong>
+              </div>
+            </div>
+            <p class="confirm-email-note">
+              Un courriel de confirmation a été envoyé à <strong id="confirmCourriel"></strong>.
+            </p>
+            <p class="confirm-address-note">
+              📍 L'adresse de la clinique vous sera communiquée par texto avant votre rendez-vous.
+            </p>
+            <div class="confirm-action">
+              <a href="index.html" class="btn btn--primary">Retour à l'accueil</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- BOOKING FORM -->
+        <form class="booking-form" id="bookingForm" novalidate>
+
+          <!-- STEP 1 -->
+          <div class="res-step" id="step1">
+            <div class="res-step__header">
+              <span class="step-tag">Étape 1</span>
+              <h2 class="step-title">Vos informations</h2>
+            </div>
+            <p class="step-error" id="step1Error" hidden></p>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="prenom">Prénom *</label>
+                <input type="text" id="prenom" name="prenom" placeholder="Votre prénom" autocomplete="given-name" />
+                <p class="field-error" id="prenomError" hidden></p>
+              </div>
+              <div class="form-group">
+                <label for="nom">Nom *</label>
+                <input type="text" id="nom" name="nom" placeholder="Votre nom" autocomplete="family-name" />
+                <p class="field-error" id="nomError" hidden></p>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="telephone">Téléphone *</label>
+              <input type="tel" id="telephone" name="telephone" placeholder="(514) 000-0000" autocomplete="tel" />
+              <p class="field-error" id="telephoneError" hidden></p>
+            </div>
+            <div class="form-group">
+              <label for="courriel">Courriel *</label>
+              <input type="email" id="courriel" name="courriel" placeholder="votre@courriel.com" autocomplete="email" />
+              <p class="field-error" id="courrielError" hidden></p>
+            </div>
+          </div>
+
+          <!-- STEP 2 -->
+          <div class="res-step" id="step2">
+            <div class="res-step__header">
+              <span class="step-tag">Étape 2</span>
+              <h2 class="step-title">Type de séance</h2>
+            </div>
+            <p class="step-error" id="step2Error" hidden></p>
+            <div class="duree-grid">
+              <label class="duree-card">
+                <input type="radio" name="duree" value="60" />
+                <div class="duree-card__inner">
+                  <span class="duree-card__temps">60 min</span>
+                  <span class="duree-card__prix">90 $ + taxes</span>
+                </div>
+              </label>
+              <label class="duree-card">
+                <input type="radio" name="duree" value="90" />
+                <div class="duree-card__inner">
+                  <span class="duree-card__temps">90 min</span>
+                  <span class="duree-card__prix">125 $ + taxes</span>
+                </div>
+              </label>
+            </div>
+          </div>
+
+          <!-- STEP 3 -->
+          <div class="res-step" id="step3">
+            <div class="res-step__header">
+              <span class="step-tag">Étape 3</span>
+              <h2 class="step-title">Choisir une date</h2>
+            </div>
+            <p class="step-hint">Disponible : lundi, mardi, mercredi et samedi.</p>
+            <p class="step-error" id="step3Error" hidden></p>
+            <div class="calendar">
+              <div class="cal-header">
+                <button type="button" class="cal-nav" id="calPrev" aria-label="Mois précédent">&#8249;</button>
+                <span class="cal-month-year" id="calMonthYear"></span>
+                <button type="button" class="cal-nav" id="calNext" aria-label="Mois suivant">&#8250;</button>
+              </div>
+              <div class="cal-day-headers">
+                <span>Lu</span><span>Ma</span><span>Me</span>
+                <span>Je</span><span>Ve</span><span>Sa</span><span>Di</span>
+              </div>
+              <div class="cal-grid" id="calGrid"></div>
+            </div>
+          </div>
+
+          <!-- STEP 4 -->
+          <div class="res-step" id="step4" hidden>
+            <div class="res-step__header">
+              <span class="step-tag">Étape 4</span>
+              <h2 class="step-title">Choisir une heure</h2>
+            </div>
+            <p class="step-error" id="step4Error" hidden></p>
+            <div class="slots-loading" id="slotsSpinner" hidden>
+              <div class="spinner"></div>
+              <span>Chargement des disponibilités…</span>
+            </div>
+            <div class="slots-grid" id="slotsGrid"></div>
+          </div>
+
+          <!-- GLOBAL ERROR -->
+          <p class="form-error-global" id="formError" hidden></p>
+
+          <!-- SUBMIT -->
+          <div class="res-step res-step--submit">
+            <button type="submit" class="btn btn--primary btn--full" id="submitBtn">
+              <span class="spinner spinner--sm" id="submitSpinner" hidden></span>
+              Confirmer mon rendez-vous
+            </button>
+            <p class="form-note">Vous recevrez un courriel de confirmation immédiatement après la réservation.</p>
+          </div>
+
+        </form>
+      </div>
+    </div>
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="container footer__content">
+      <div class="footer__logo">
+        <img src="images/logo.png" alt="KinesiaRelief" class="footer__logo-img" />
+      </div>
+      <div class="footer__links">
+        <a href="index.html#apropos">À propos</a>
+        <a href="index.html#horaire">Horaire</a>
+        <a href="index.html#contact">Contact</a>
+      </div>
+      <p class="footer__copy">&copy; 2025 · Tous droits réservés · Saint-Rémi, Québec</p>
+    </div>
+  </footer>
+
+  <script>
+  (function () {
+
+    // ===== NAV =====
+    const header = document.getElementById('header');
+    window.addEventListener('scroll', () => {
+      header.classList.toggle('scrolled', window.scrollY > 40);
+    });
+    const burger = document.getElementById('burger');
+    const navLinks = document.querySelector('.nav__links');
+    burger.addEventListener('click', () => {
+      burger.classList.toggle('open');
+      navLinks.classList.toggle('open');
+    });
+    navLinks.querySelectorAll('a').forEach(link => {
+      link.addEventListener('click', () => {
+        burger.classList.remove('open');
+        navLinks.classList.remove('open');
+      });
+    });
+
+    // ===== CALENDAR STATE =====
+    const MONTHS_FR = ['Janvier','Février','Mars','Avril','Mai','Juin',
+                       'Juillet','Août','Septembre','Octobre','Novembre','Décembre'];
+    const ALLOWED_DAYS = new Set([1, 2, 3, 6]); // Lu Ma Me Sa
+
+    const now = new Date();
+    let calYear  = now.getFullYear();
+    let calMonth = now.getMonth();
+    let selectedDate = null;
+    let selectedTime = null;
+
+    function todayMidnight() {
+      const d = new Date();
+      d.setHours(0, 0, 0, 0);
+      return d;
+    }
+
+    function isDisabled(date) {
+      return date < todayMidnight() || !ALLOWED_DAYS.has(date.getDay());
+    }
+
+    function toDateStr(y, m, d) {
+      return `${y}-${String(m + 1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    }
+
+    // ===== RENDER CALENDAR =====
+    function renderCalendar() {
+      const grid        = document.getElementById('calGrid');
+      const monthLabel  = document.getElementById('calMonthYear');
+      const prevBtn     = document.getElementById('calPrev');
+      const n           = new Date();
+
+      monthLabel.textContent = `${MONTHS_FR[calMonth]} ${calYear}`;
+      prevBtn.disabled = (calYear === n.getFullYear() && calMonth <= n.getMonth());
+
+      grid.innerHTML = '';
+
+      const firstDay  = new Date(calYear, calMonth, 1);
+      const lastDate  = new Date(calYear, calMonth + 1, 0).getDate();
+      const offset    = (firstDay.getDay() - 1 + 7) % 7; // Monday-first
+      const todayStr  = toDateStr(n.getFullYear(), n.getMonth(), n.getDate());
+
+      for (let i = 0; i < offset; i++) {
+        const empty = document.createElement('div');
+        empty.className = 'cal-cell cal-cell--empty';
+        grid.appendChild(empty);
+      }
+
+      for (let day = 1; day <= lastDate; day++) {
+        const date    = new Date(calYear, calMonth, day);
+        const dateStr = toDateStr(calYear, calMonth, day);
+        const disabled   = isDisabled(date);
+        const isToday    = dateStr === todayStr;
+        const isSelected = dateStr === selectedDate;
+
+        const cell = document.createElement('div');
+        cell.className = [
+          'cal-cell',
+          disabled    ? 'cal-cell--disabled'  : 'cal-cell--available',
+          isToday     ? 'cal-cell--today'     : '',
+          isSelected  ? 'cal-cell--selected'  : '',
+        ].filter(Boolean).join(' ');
+        cell.textContent = day;
+
+        if (!disabled) {
+          cell.setAttribute('role', 'button');
+          cell.setAttribute('tabindex', '0');
+          cell.addEventListener('click', () => handleDateClick(dateStr));
+          cell.addEventListener('keydown', e => {
+            if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleDateClick(dateStr); }
+          });
+        }
+        grid.appendChild(cell);
+      }
+    }
+
+    // ===== DATE CLICK =====
+    function handleDateClick(dateStr) {
+      if (!validateStep1()) return;
+      if (!validateStep2()) return;
+      clearStepError('step3Error');
+      selectedDate = dateStr;
+      selectedTime = null;
+      renderCalendar();
+      fetchSlots();
+    }
+
+    // ===== FETCH SLOTS =====
+    async function fetchSlots() {
+      const dureeEl = document.querySelector('input[name="duree"]:checked');
+      if (!dureeEl || !selectedDate) return;
+
+      const step4   = document.getElementById('step4');
+      const spinner = document.getElementById('slotsSpinner');
+      const grid    = document.getElementById('slotsGrid');
+
+      step4.hidden   = false;
+      grid.innerHTML = '';
+      spinner.hidden = false;
+
+      setTimeout(() => step4.scrollIntoView({ behavior: 'smooth', block: 'start' }), 80);
+
+      try {
+        const res  = await fetch(`/.netlify/functions/get-availability?date=${selectedDate}&duree=${dureeEl.value}`);
+        const data = await res.json();
+        spinner.hidden = true;
+
+        if (!Array.isArray(data.slots)) {
+          grid.innerHTML = '<p class="slots-empty">Impossible de récupérer les disponibilités.</p>';
+          return;
+        }
+
+        const anyAvailable = data.slots.some(s => s.available);
+        if (!anyAvailable) {
+          grid.innerHTML = '<p class="slots-empty">Aucun créneau disponible ce jour — choisissez une autre date.</p>';
+          return;
+        }
+
+        data.slots.forEach(slot => {
+          const pill = document.createElement('button');
+          pill.type = 'button';
+          pill.textContent = slot.time;
+          pill.className = slot.available ? 'slot-pill' : 'slot-pill slot-pill--unavailable';
+          pill.disabled   = !slot.available;
+
+          if (slot.available) {
+            pill.addEventListener('click', () => {
+              document.querySelectorAll('.slot-pill--selected').forEach(p => p.classList.remove('slot-pill--selected'));
+              pill.classList.add('slot-pill--selected');
+              selectedTime = slot.time;
+              clearStepError('step4Error');
+            });
+          }
+          grid.appendChild(pill);
+        });
+
+      } catch {
+        spinner.hidden = true;
+        grid.innerHTML = '<p class="slots-empty">Erreur de connexion. Veuillez réessayer.</p>';
+      }
+    }
+
+    // ===== VALIDATION =====
+    function validateStep1() {
+      clearStepError('step1Error');
+      const fields = [
+        { id: 'prenom',    msg: 'Le prénom est requis.' },
+        { id: 'nom',       msg: 'Le nom est requis.' },
+        { id: 'telephone', msg: 'Le téléphone est requis.' },
+        { id: 'courriel',  msg: 'Un courriel valide est requis.', check: v => v.includes('@') && v.includes('.') },
+      ];
+      let valid = true;
+      fields.forEach(({ id, msg, check }) => {
+        const input = document.getElementById(id);
+        const errEl = document.getElementById(`${id}Error`);
+        const val   = input.value.trim();
+        const ok    = val && (!check || check(val));
+        input.classList.toggle('input--error', !ok);
+        if (errEl) { errEl.textContent = ok ? '' : msg; errEl.hidden = ok; }
+        if (!ok) valid = false;
+      });
+      if (!valid) {
+        showStepError('step1Error', 'Veuillez compléter vos informations avant de choisir une date.');
+        document.getElementById('step1').scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+      return valid;
+    }
+
+    function validateStep2() {
+      const duree = document.querySelector('input[name="duree"]:checked');
+      if (!duree) {
+        showStepError('step2Error', 'Veuillez sélectionner une durée avant de choisir une date.');
+        document.getElementById('step2').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        return false;
+      }
+      clearStepError('step2Error');
+      return true;
+    }
+
+    function showStepError(id, msg) {
+      const el = document.getElementById(id);
+      if (el) { el.textContent = msg; el.hidden = false; }
+    }
+    function clearStepError(id) {
+      const el = document.getElementById(id);
+      if (el) { el.textContent = ''; el.hidden = true; }
+    }
+
+    // ===== DATE FORMAT =====
+    function formatDateFr(dateStr) {
+      const [y, m, d] = dateStr.split('-').map(Number);
+      const dt   = new Date(Date.UTC(y, m - 1, d));
+      const jours = ['dimanche','lundi','mardi','mercredi','jeudi','vendredi','samedi'];
+      const mois  = ['janvier','février','mars','avril','mai','juin',
+                     'juillet','août','septembre','octobre','novembre','décembre'];
+      return `${jours[dt.getUTCDay()]} ${d} ${mois[m - 1]} ${y}`;
+    }
+
+    // ===== SUBMIT =====
+    document.getElementById('bookingForm').addEventListener('submit', async e => {
+      e.preventDefault();
+      document.getElementById('formError').hidden = true;
+
+      if (!validateStep1()) return;
+      if (!validateStep2()) return;
+
+      if (!selectedDate) {
+        showStepError('step3Error', 'Veuillez choisir une date.');
+        document.getElementById('step3').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        return;
+      }
+      if (!selectedTime) {
+        showStepError('step4Error', 'Veuillez choisir une heure.');
+        document.getElementById('step4').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        return;
+      }
+
+      const dureeEl     = document.querySelector('input[name="duree"]:checked');
+      const submitBtn   = document.getElementById('submitBtn');
+      const submitSpin  = document.getElementById('submitSpinner');
+
+      submitBtn.disabled  = true;
+      submitSpin.hidden   = false;
+
+      const payload = {
+        prenom:    document.getElementById('prenom').value.trim(),
+        nom:       document.getElementById('nom').value.trim(),
+        telephone: document.getElementById('telephone').value.trim(),
+        courriel:  document.getElementById('courriel').value.trim(),
+        duree:     parseInt(dureeEl.value, 10),
+        date:      selectedDate,
+        heure:     selectedTime,
+      };
+
+      try {
+        const res  = await fetch('/.netlify/functions/create-booking', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        });
+        const data = await res.json();
+
+        submitBtn.disabled = false;
+        submitSpin.hidden  = true;
+
+        if (!res.ok || data.error || data.available === false) {
+          const formError = document.getElementById('formError');
+          formError.textContent = data.error || 'Une erreur est survenue. Veuillez réessayer.';
+          formError.hidden = false;
+          formError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          return;
+        }
+
+        // SUCCESS
+        const dateFormatted = formatDateFr(selectedDate);
+        document.getElementById('confirmPrenom').textContent  = payload.prenom;
+        document.getElementById('confirmDate').textContent    = dateFormatted;
+        document.getElementById('confirmHeure').textContent   = selectedTime;
+        document.getElementById('confirmDuree').textContent   = payload.duree;
+        document.getElementById('confirmCourriel').textContent = payload.courriel;
+
+        document.getElementById('bookingForm').hidden = true;
+        const card = document.getElementById('confirmCard');
+        card.hidden = false;
+        card.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+      } catch {
+        submitBtn.disabled = false;
+        submitSpin.hidden  = true;
+        const formError = document.getElementById('formError');
+        formError.textContent = 'Erreur de connexion. Veuillez réessayer.';
+        formError.hidden = false;
+      }
+    });
+
+    // ===== CALENDAR NAV =====
+    document.getElementById('calPrev').addEventListener('click', () => {
+      calMonth--;
+      if (calMonth < 0) { calMonth = 11; calYear--; }
+      renderCalendar();
+    });
+    document.getElementById('calNext').addEventListener('click', () => {
+      calMonth++;
+      if (calMonth > 11) { calMonth = 0; calYear++; }
+      renderCalendar();
+    });
+
+    // Re-fetch if duration changes after date selected
+    document.querySelectorAll('input[name="duree"]').forEach(radio => {
+      radio.addEventListener('change', () => { if (selectedDate) fetchSlots(); });
+    });
+
+    // ===== INIT =====
+    renderCalendar();
+
+  })();
+  </script>
+</body>
+</html>
