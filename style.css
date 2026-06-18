@@ -82,6 +82,8 @@ ul { list-style: none; }
 }
 
 .section--dark .section__title { color: var(--color-white); }
+.section__title em { font-style: italic; color: var(--color-primary); }
+.section--dark .section__title em { color: var(--color-primary-light); }
 
 .section__desc {
   color: var(--color-text-light);
