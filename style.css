@@ -1078,6 +1078,8 @@ a.coord-item:hover {
 /* Service options */
 .service-list { display: flex; flex-direction: column; gap: 8px; }
 
+.service-option { display: block; cursor: pointer; }
+
 .service-option input { display: none; }
 
 .service-option__inner {
