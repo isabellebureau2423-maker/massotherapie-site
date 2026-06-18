@@ -147,10 +147,9 @@ ul { list-style: none; }
 
 @media (max-width: 768px) {
   .galerie__grid {
-    grid-template-columns: 1fr 1fr;
-    grid-template-rows: 200px 200px;
+    grid-template-columns: 1fr;
+    grid-template-rows: auto;
   }
-  .galerie__item--tall { grid-column: 1 / -1; }
 }
 
 /* ===== BUTTONS ===== */
