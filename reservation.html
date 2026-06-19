@@ -99,37 +99,37 @@
             </div>
             <p class="step-error" id="stepSoinError" hidden></p>
             <div class="service-list" id="serviceList">
-              <button type="button" class="service-option" data-value="Ventouses">
+              <button type="button" class="service-option" onclick="selectSoin(this)" data-value="Ventouses">
                 <div class="service-option__inner">
                   <strong>Ventouses</strong>
                   <span>Décompression des tissus, amélioration de la circulation et relâchement des tensions en profondeur.</span>
                 </div>
               </button>
-              <button type="button" class="service-option" data-value="Drainage lymphatique">
+              <button type="button" class="service-option" onclick="selectSoin(this)" data-value="Drainage lymphatique">
                 <div class="service-option__inner">
                   <strong>Drainage lymphatique</strong>
                   <span>Stimulation douce du système lymphatique pour réduire l'œdème et favoriser la détoxification.</span>
                 </div>
               </button>
-              <button type="button" class="service-option" data-value="Massage sportif">
+              <button type="button" class="service-option" onclick="selectSoin(this)" data-value="Massage sportif">
                 <div class="service-option__inner">
                   <strong>Massage sportif</strong>
                   <span>Préparation musculaire et récupération après l'effort — idéal pour les athlètes et sportifs actifs.</span>
                 </div>
               </button>
-              <button type="button" class="service-option" data-value="Massage de détente">
+              <button type="button" class="service-option" onclick="selectSoin(this)" data-value="Massage de détente">
                 <div class="service-option__inner">
                   <strong>Massage de détente</strong>
                   <span>Relaxation profonde du corps et de l'esprit pour libérer le stress et améliorer le bien-être général.</span>
                 </div>
               </button>
-              <button type="button" class="service-option" data-value="Massage thérapeutique">
+              <button type="button" class="service-option" onclick="selectSoin(this)" data-value="Massage thérapeutique">
                 <div class="service-option__inner">
                   <strong>Massage thérapeutique</strong>
                   <span>Traitement ciblé des douleurs chroniques, blessures et contractures musculaires.</span>
                 </div>
               </button>
-              <button type="button" class="service-option" data-value="Massage en profondeur">
+              <button type="button" class="service-option" onclick="selectSoin(this)" data-value="Massage en profondeur">
                 <div class="service-option__inner">
                   <strong>Massage en profondeur</strong>
                   <span>Travail ciblé sur les nœuds et tensions musculaires chroniques pour restaurer mobilité et confort.</span>
@@ -576,14 +576,12 @@
     });
 
     // ===== SERVICE OPTION CLICKS =====
-    document.querySelectorAll('.service-option').forEach(el => {
-      el.addEventListener('click', () => {
-        selectedService = el.dataset.value;
-        document.querySelectorAll('.service-option__inner').forEach(i => i.classList.remove('selected'));
-        el.querySelector('.service-option__inner').classList.add('selected');
-        clearStepError('stepSoinError');
-      });
-    });
+    window.selectSoin = function(btn) {
+      selectedService = btn.dataset.value;
+      document.querySelectorAll('.service-option__inner').forEach(i => i.classList.remove('selected'));
+      btn.querySelector('.service-option__inner').classList.add('selected');
+      clearStepError('stepSoinError');
+    };
 
     // ===== INIT =====
     renderCalendar();
