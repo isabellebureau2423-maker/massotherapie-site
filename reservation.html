@@ -580,6 +580,17 @@
       radio.addEventListener('change', () => { if (selectedDate) fetchSlots(); });
     });
 
+    // ===== SERVICE OPTION CLICKS =====
+    document.querySelectorAll('.service-option').forEach(label => {
+      label.addEventListener('click', () => {
+        const radio = label.querySelector('input[type="radio"]');
+        if (radio) radio.checked = true;
+        document.querySelectorAll('.service-option__inner').forEach(el => el.classList.remove('selected'));
+        label.querySelector('.service-option__inner').classList.add('selected');
+        clearStepError('stepSoinError');
+      });
+    });
+
     // ===== INIT =====
     renderCalendar();
 
