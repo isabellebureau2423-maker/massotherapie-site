@@ -95,7 +95,7 @@
           <div class="res-step" id="stepSoin">
             <div class="res-step__header">
               <span class="step-tag">Étape 1</span>
-              <h2 class="step-title">Type de soin <span id="vcheck" style="font-size:0.5rem;color:#B8922A;vertical-align:middle;">v13</span></h2>
+              <h2 class="step-title">Type de soin</h2>
             </div>
             <p class="step-error" id="stepSoinError" hidden></p>
             <div class="service-list" id="serviceList">
@@ -248,6 +248,20 @@
   </footer>
 
   <script>
+  // ===== SOIN SELECTION (global — called by onclick on each button) =====
+  var selectedService = null;
+  function selectSoin(btn) {
+    selectedService = btn.getAttribute('data-value');
+    document.querySelectorAll('.service-option__inner').forEach(function(i) {
+      i.classList.remove('selected');
+    });
+    btn.querySelector('.service-option__inner').classList.add('selected');
+    var err = document.getElementById('stepSoinError');
+    if (err) { err.textContent = ''; err.hidden = true; }
+  }
+  </script>
+
+  <script>
   (function () {
 
     // ===== NAV =====
@@ -280,9 +294,8 @@
     const now = new Date();
     let calYear  = now.getFullYear();
     let calMonth = now.getMonth();
-    let selectedDate    = null;
-    let selectedTime    = null;
-    let selectedService = null;
+    let selectedDate = null;
+    let selectedTime = null;
 
     function todayMidnight() {
       const d = new Date();
@@ -575,13 +588,6 @@
       radio.addEventListener('change', () => { if (selectedDate) fetchSlots(); });
     });
 
-    // ===== SERVICE OPTION CLICKS =====
-    window.selectSoin = function(btn) {
-      selectedService = btn.dataset.value;
-      document.querySelectorAll('.service-option__inner').forEach(i => i.classList.remove('selected'));
-      btn.querySelector('.service-option__inner').classList.add('selected');
-      clearStepError('stepSoinError');
-    };
 
     // ===== INIT =====
     renderCalendar();
