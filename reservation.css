@@ -576,6 +576,17 @@
 }
 
 .btn--cancel:hover { background: #c0392b; color: #fff; }
+.btn--cancel:disabled { opacity: 0.55; cursor: not-allowed; }
+
+.cancel-msg {
+  margin: 10px 0 0;
+  font-size: 0.84rem;
+  line-height: 1.5;
+  padding: 10px 14px;
+  border-radius: 6px;
+}
+.cancel-msg--ok  { background: rgba(42,84,70,0.08); color: #2A5446; }
+.cancel-msg--err { background: rgba(192,57,43,0.08); color: #c0392b; }
 
 .confirm-action {
   padding: 24px 40px 36px;

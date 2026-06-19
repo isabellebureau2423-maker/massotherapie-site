@@ -141,7 +141,7 @@ exports.handler = async (event) => {
               </div>
               <div style="background: #fff8ed; border-left: 4px solid #B8922A; border-radius: 8px; padding: 16px 20px; margin-bottom: 28px;">
                 <p style="margin: 0; color: #7A5A1A; font-size: 0.9rem;">
-                  📍 <strong>Important :</strong> L'adresse de la clinique vous sera communiquée par texto avant votre rendez-vous.
+                  📍 <strong>Adresse :</strong> 1030 rue Saint-Paul, appartement 102, Saint-Rémi
                 </p>
               </div>
               <p style="color: #3A5E50; line-height: 1.65; margin: 0 0 8px;">

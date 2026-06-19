@@ -80,7 +80,7 @@
               Un courriel de confirmation a été envoyé à <strong id="confirmCourriel"></strong>.
             </p>
             <p class="confirm-address-note">
-              📍 L'adresse de la clinique vous sera communiquée par texto avant votre rendez-vous.
+              📍 <strong>Adresse :</strong> 1030 rue Saint-Paul, appartement 102, Saint-Rémi
             </p>
 
             <div class="confirm-cancel">
@@ -91,7 +91,8 @@
                   <p>Pour annuler ou modifier votre rendez-vous, vous devez nous contacter au moins <strong>24 heures à l'avance</strong>. Passé ce délai, la séance est considérée comme effectuée.</p>
                 </div>
               </div>
-              <a id="cancelLink" href="#" class="btn btn--cancel">Annuler mon rendez-vous</a>
+              <button id="cancelBtn" type="button" class="btn btn--cancel">Annuler mon rendez-vous</button>
+              <p id="cancelMsg" class="cancel-msg" hidden></p>
             </div>
 
             <div class="confirm-action">
@@ -587,12 +588,53 @@
         document.getElementById('confirmDuree').textContent    = `${payload.duree} min — ${prixMap[payload.duree] || ''} + taxes`;
         document.getElementById('confirmCourriel').textContent = payload.courriel;
 
-        // Lien d'annulation par courriel pré-rempli
-        const cancelSubject = encodeURIComponent("Demande d'annulation — KinesiaRelief");
-        const cancelBody = encodeURIComponent(
-          `Bonjour Isabelle,\n\nJe souhaite annuler mon rendez-vous :\n\nNom : ${payload.prenom}\nDate : ${dateFormatted}\nHeure : ${selectedTime}\nSoin : ${payload.service}\nDurée : ${payload.duree} min\n\nMerci de confirmer l'annulation.\n\nCordialement`
-        );
-        document.getElementById('cancelLink').href = `mailto:isabellebureau2423@gmail.com?subject=${cancelSubject}&body=${cancelBody}`;
+        // Bouton d'annulation — appel à la fonction Netlify
+        const cancelBtn = document.getElementById('cancelBtn');
+        cancelBtn.dataset.prenom   = payload.prenom;
+        cancelBtn.dataset.courriel = payload.courriel;
+        cancelBtn.dataset.date     = dateFormatted;
+        cancelBtn.dataset.heure    = selectedTime;
+        cancelBtn.dataset.service  = payload.service;
+        cancelBtn.dataset.duree    = String(payload.duree);
+
+        cancelBtn.addEventListener('click', async function () {
+          if (!window.confirm('Confirmer la demande d\'annulation de votre rendez-vous ?')) return;
+          this.disabled = true;
+          this.textContent = 'Envoi en cours…';
+          const msg = document.getElementById('cancelMsg');
+          try {
+            const r = await fetch('/.netlify/functions/cancel-request', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                prenom:   this.dataset.prenom,
+                courriel: this.dataset.courriel,
+                date:     this.dataset.date,
+                heure:    this.dataset.heure,
+                service:  this.dataset.service,
+                duree:    this.dataset.duree,
+              }),
+            });
+            const data = await r.json();
+            msg.hidden = false;
+            if (data.success) {
+              this.hidden = true;
+              msg.className = 'cancel-msg cancel-msg--ok';
+              msg.textContent = 'Votre demande d\'annulation a été envoyée. Vous recevrez une confirmation par courriel.';
+            } else {
+              this.disabled = false;
+              this.textContent = 'Annuler mon rendez-vous';
+              msg.className = 'cancel-msg cancel-msg--err';
+              msg.textContent = 'Erreur lors de l\'envoi. Contactez-nous au 438-939-8359.';
+            }
+          } catch {
+            this.disabled = false;
+            this.textContent = 'Annuler mon rendez-vous';
+            msg.hidden = false;
+            msg.className = 'cancel-msg cancel-msg--err';
+            msg.textContent = 'Impossible d\'envoyer. Contactez-nous au 438-939-8359.';
+          }
+        });
 
         document.getElementById('bookingForm').hidden = true;
         const card = document.getElementById('confirmCard');
