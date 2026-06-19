@@ -99,48 +99,42 @@
             </div>
             <p class="step-error" id="stepSoinError" hidden></p>
             <div class="service-list" id="serviceList">
-              <label class="service-option">
-                <input type="radio" name="service" value="Ventouses" />
+              <div class="service-option" data-value="Ventouses">
                 <div class="service-option__inner">
                   <strong>Ventouses</strong>
                   <span>Décompression des tissus, amélioration de la circulation et relâchement des tensions en profondeur.</span>
                 </div>
-              </label>
-              <label class="service-option">
-                <input type="radio" name="service" value="Drainage lymphatique" />
+              </div>
+              <div class="service-option" data-value="Drainage lymphatique">
                 <div class="service-option__inner">
                   <strong>Drainage lymphatique</strong>
                   <span>Stimulation douce du système lymphatique pour réduire l'œdème et favoriser la détoxification.</span>
                 </div>
-              </label>
-              <label class="service-option">
-                <input type="radio" name="service" value="Massage sportif" />
+              </div>
+              <div class="service-option" data-value="Massage sportif">
                 <div class="service-option__inner">
                   <strong>Massage sportif</strong>
                   <span>Préparation musculaire et récupération après l'effort — idéal pour les athlètes et sportifs actifs.</span>
                 </div>
-              </label>
-              <label class="service-option">
-                <input type="radio" name="service" value="Massage de détente" />
+              </div>
+              <div class="service-option" data-value="Massage de détente">
                 <div class="service-option__inner">
                   <strong>Massage de détente</strong>
                   <span>Relaxation profonde du corps et de l'esprit pour libérer le stress et améliorer le bien-être général.</span>
                 </div>
-              </label>
-              <label class="service-option">
-                <input type="radio" name="service" value="Massage thérapeutique" />
+              </div>
+              <div class="service-option" data-value="Massage thérapeutique">
                 <div class="service-option__inner">
                   <strong>Massage thérapeutique</strong>
                   <span>Traitement ciblé des douleurs chroniques, blessures et contractures musculaires.</span>
                 </div>
-              </label>
-              <label class="service-option">
-                <input type="radio" name="service" value="Massage en profondeur" />
+              </div>
+              <div class="service-option" data-value="Massage en profondeur">
                 <div class="service-option__inner">
                   <strong>Massage en profondeur</strong>
                   <span>Travail ciblé sur les nœuds et tensions musculaires chroniques pour restaurer mobilité et confort.</span>
                 </div>
-              </label>
+              </div>
             </div>
           </div>
 
@@ -286,8 +280,9 @@
     const now = new Date();
     let calYear  = now.getFullYear();
     let calMonth = now.getMonth();
-    let selectedDate = null;
-    let selectedTime = null;
+    let selectedDate    = null;
+    let selectedTime    = null;
+    let selectedService = null;
 
     function todayMidnight() {
       const d = new Date();
@@ -477,7 +472,7 @@
       } else { courrielErr.hidden = true; document.getElementById('courriel').classList.remove('input--error'); }
       if (!formValid) return;
 
-      const serviceVal = document.querySelector('input[name="service"]:checked')?.value || '';
+      const serviceVal = selectedService || '';
       if (!serviceVal) {
         showStepError('stepSoinError', 'Veuillez choisir un type de soin.');
         document.getElementById('stepSoin').scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -581,12 +576,11 @@
     });
 
     // ===== SERVICE OPTION CLICKS =====
-    document.querySelectorAll('.service-option').forEach(label => {
-      label.addEventListener('click', () => {
-        const radio = label.querySelector('input[type="radio"]');
-        if (radio) radio.checked = true;
-        document.querySelectorAll('.service-option__inner').forEach(el => el.classList.remove('selected'));
-        label.querySelector('.service-option__inner').classList.add('selected');
+    document.querySelectorAll('.service-option').forEach(el => {
+      el.addEventListener('click', () => {
+        selectedService = el.dataset.value;
+        document.querySelectorAll('.service-option__inner').forEach(i => i.classList.remove('selected'));
+        el.querySelector('.service-option__inner').classList.add('selected');
         clearStepError('stepSoinError');
       });
     });
