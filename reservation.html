@@ -312,10 +312,21 @@
       return weeks % 2 === 0;
     }
 
+    const MIN_HOURS_ADVANCE = 24;
+
+    function slotDateTime(dateStr, timeStr) {
+      const [h, m] = timeStr.split('h').map(Number);
+      const [y, mo, d] = dateStr.split('-').map(Number);
+      return new Date(y, mo - 1, d, h, m || 0, 0);
+    }
+
     function isDisabled(date) {
       const dow = date.getDay();
-      if (date < todayMidnight() || !ALLOWED_DAYS.has(dow)) return true;
+      if (!ALLOWED_DAYS.has(dow)) return true;
       if (dow === 0 || dow === 6) return !isWeekendDispo(date);
+      // Block date if last slot (15h30) is within 24h
+      const lastSlot = new Date(date.getFullYear(), date.getMonth(), date.getDate(), 15, 30, 0);
+      if (lastSlot - new Date() < MIN_HOURS_ADVANCE * 3600 * 1000) return true;
       return false;
     }
 
@@ -423,10 +434,12 @@
           const pill = document.createElement('button');
           pill.type = 'button';
           pill.textContent = slot.time;
-          pill.className = slot.available ? 'slot-pill' : 'slot-pill slot-pill--unavailable';
-          pill.disabled   = !slot.available;
+          const tooSoon = (slotDateTime(selectedDate, slot.time) - new Date()) < MIN_HOURS_ADVANCE * 3600 * 1000;
+          const available = slot.available && !tooSoon;
+          pill.className = available ? 'slot-pill' : 'slot-pill slot-pill--unavailable';
+          pill.disabled   = !available;
 
-          if (slot.available) {
+          if (available) {
             pill.addEventListener('click', () => {
               document.querySelectorAll('.slot-pill--selected').forEach(p => p.classList.remove('slot-pill--selected'));
               pill.classList.add('slot-pill--selected');
