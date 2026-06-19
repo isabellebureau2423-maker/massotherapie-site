@@ -1094,11 +1094,14 @@ a.coord-item:hover {
   transition: var(--transition);
 }
 
-.service-option input:checked + .service-option__inner,
 .service-option__inner.selected {
-  border-color: var(--color-accent);
-  background: rgba(58,107,94,0.1);
-  box-shadow: 0 4px 16px rgba(42,84,70,0.15);
+  border-color: var(--color-primary) !important;
+  background: rgba(184,146,42,0.1) !important;
+  box-shadow: 0 4px 16px rgba(184,146,42,0.25);
+}
+
+.service-option__inner.selected strong {
+  color: var(--color-primary);
 }
 
 .service-option__inner:hover { border-color: var(--color-accent-light); }
