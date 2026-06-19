@@ -116,13 +116,17 @@ exports.handler = async (event) => {
     };
   }
 
-  // Limite de fin de journée : 20h00 Toronto en UTC
-  const cutoffUTC = torontoToUTC(date, '20:00');
+  // Horaire selon le jour : semaine 8h-17h, weekend 9h-16h
+  const dow = new Date(date + 'T12:00:00').getDay();
+  const isWeekend = dow === 0 || dow === 6;
+  const startHour = isWeekend ? 9 : 8;
+  const endHour   = isWeekend ? 16 : 17;
 
-  // Générer les créneaux de 08h00 à 19h30 par tranches de 30 min
+  const cutoffUTC = torontoToUTC(date, `${String(endHour).padStart(2,'0')}:00`);
+
   const slots = [];
 
-  for (let minOfDay = 8 * 60; minOfDay < 20 * 60; minOfDay += 30) {
+  for (let minOfDay = startHour * 60; minOfDay < endHour * 60; minOfDay += 30) {
     const hh = String(Math.floor(minOfDay / 60)).padStart(2, '0');
     const mm = String(minOfDay % 60).padStart(2, '0');
     const slotTime = `${hh}:${mm}`;
@@ -130,7 +134,7 @@ exports.handler = async (event) => {
     const slotStart = torontoToUTC(date, slotTime);
     const slotEnd = new Date(slotStart.getTime() + totalBlockMin * 60 * 1000);
 
-    // Créneau invalide si le bloc dépasse 20h00
+    // Créneau invalide si le bloc dépasse la fin de journée
     if (slotEnd > cutoffUTC) {
       slots.push({ time: slotTime, available: false });
       continue;

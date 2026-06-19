@@ -323,11 +323,15 @@
     function isDisabled(date) {
       const dow = date.getDay();
       if (!ALLOWED_DAYS.has(dow)) return true;
-      if (dow === 0 || dow === 6) return !isWeekendDispo(date);
-      // Block date if last slot (15h30) is within 24h
+      if (dow === 0 || dow === 6) {
+        if (!isWeekendDispo(date)) return true;
+        // Weekend: last slot 14h30 (14h30 + 90min = 16h00)
+        const lastSlot = new Date(date.getFullYear(), date.getMonth(), date.getDate(), 14, 30, 0);
+        return lastSlot - new Date() < MIN_HOURS_ADVANCE * 3600 * 1000;
+      }
+      // Semaine: last slot 15h30 (15h30 + 90min = 17h00)
       const lastSlot = new Date(date.getFullYear(), date.getMonth(), date.getDate(), 15, 30, 0);
-      if (lastSlot - new Date() < MIN_HOURS_ADVANCE * 3600 * 1000) return true;
-      return false;
+      return lastSlot - new Date() < MIN_HOURS_ADVANCE * 3600 * 1000;
     }
 
     function toDateStr(y, m, d) {

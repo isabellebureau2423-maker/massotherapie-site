@@ -78,7 +78,8 @@ if (scrollTopBtn) {
 
   const JOURS = ['Dimanche','Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi'];
   const MOIS  = ['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'];
-  const SLOTS = ['8h00','9h30','11h00','12h30','14h00','15h30'];
+  const SLOTS_SEMAINE = ['8h00','9h30','11h00','12h30','14h00','15h30'];
+  const SLOTS_WEEKEND = ['9h00','10h30','12h00','13h30','14h30'];
 
   // Référence : samedi 21 juin 2026 = 1er weekend disponible
   const REF_SAT = new Date(2026, 5, 21);
@@ -109,6 +110,7 @@ if (scrollTopBtn) {
     if (!dispo) {
       return `<div class="plage plage--ferme"><div class="plage__jour">${nom}</div><div class="plage__date">${date}</div><div class="plage__ferme-label">Fermé</div></div>`;
     }
-    return `<div class="plage plage--dispo"><div class="plage__jour">${nom}</div><div class="plage__date">${date}</div><div class="plage__heures">${SLOTS.map(s => `<span class="plage__heure">${s}</span>`).join('')}</div></div>`;
+    const slots = isWE ? SLOTS_WEEKEND : SLOTS_SEMAINE;
+    return `<div class="plage plage--dispo"><div class="plage__jour">${nom}</div><div class="plage__date">${date}</div><div class="plage__heures">${slots.map(s => `<span class="plage__heure">${s}</span>`).join('')}</div></div>`;
   }).join('');
 })();
