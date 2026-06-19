@@ -82,6 +82,18 @@
             <p class="confirm-address-note">
               📍 L'adresse de la clinique vous sera communiquée par texto avant votre rendez-vous.
             </p>
+
+            <div class="confirm-cancel">
+              <div class="confirm-cancel__policy">
+                <span class="confirm-cancel__icon">⚠️</span>
+                <div>
+                  <strong>Politique d'annulation</strong>
+                  <p>Pour annuler ou modifier votre rendez-vous, vous devez nous contacter au moins <strong>24 heures à l'avance</strong>. Passé ce délai, la séance est considérée comme effectuée.</p>
+                </div>
+              </div>
+              <a id="cancelLink" href="#" class="btn btn--cancel">Annuler mon rendez-vous</a>
+            </div>
+
             <div class="confirm-action">
               <a href="index.html" class="btn btn--primary">Retour à l'accueil</a>
             </div>
@@ -574,6 +586,13 @@
         document.getElementById('confirmHeure').textContent    = selectedTime;
         document.getElementById('confirmDuree').textContent    = `${payload.duree} min — ${prixMap[payload.duree] || ''} + taxes`;
         document.getElementById('confirmCourriel').textContent = payload.courriel;
+
+        // Lien d'annulation par courriel pré-rempli
+        const cancelSubject = encodeURIComponent("Demande d'annulation — KinesiaRelief");
+        const cancelBody = encodeURIComponent(
+          `Bonjour Isabelle,\n\nJe souhaite annuler mon rendez-vous :\n\nNom : ${payload.prenom}\nDate : ${dateFormatted}\nHeure : ${selectedTime}\nSoin : ${payload.service}\nDurée : ${payload.duree} min\n\nMerci de confirmer l'annulation.\n\nCordialement`
+        );
+        document.getElementById('cancelLink').href = `mailto:isabellebureau2423@gmail.com?subject=${cancelSubject}&body=${cancelBody}`;
 
         document.getElementById('bookingForm').hidden = true;
         const card = document.getElementById('confirmCard');
