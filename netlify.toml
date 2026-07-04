@@ -4,6 +4,9 @@
 [functions]
   node_bundler = "esbuild"
 
+[functions."send-reminders"]
+  schedule = "0 * * * *"
+
 [[headers]]
   for = "/*.css"
   [headers.values]

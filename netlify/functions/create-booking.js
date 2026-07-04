@@ -116,6 +116,14 @@ exports.handler = async (event) => {
         start: { dateTime: startDateTime.toISOString(), timeZone: TZ },
         end: { dateTime: endDateTime.toISOString(), timeZone: TZ },
         colorId: '2',
+        extendedProperties: {
+          private: {
+            clientEmail:  courriel,
+            clientPrenom: prenom,
+            clientDuree:  String(duree),
+            reminded:     'false',
+          },
+        },
       },
     });
   } catch (err) {
