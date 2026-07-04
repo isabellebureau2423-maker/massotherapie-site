@@ -49,7 +49,7 @@ exports.handler = async (event) => {
   }
 
   if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) {
-    return { statusCode: 400, headers: CORS_HEADERS, body: JSON.stringify({ error: 'Format de date invalide (attendu YYYY-MM-DD)' }) };
+    return { statusCode: 400, headers: CORS_HEADERS, body: JSON.stringify({ error: 'Format de date invalide' }) };
   }
 
   const durationMin = parseInt(duree, 10);
@@ -67,7 +67,31 @@ exports.handler = async (event) => {
 
   const calendar = google.calendar({ version: 'v3', auth });
 
-  // Horaire selon le jour
+  const dayStart = torontoToUTC(date, '00:00');
+  const dayEnd   = torontoToUTC(date, '23:59');
+  dayEnd.setSeconds(59);
+
+  let events = [];
+  try {
+    const res = await calendar.events.list({
+      calendarId: process.env.GOOGLE_CALENDAR_ID,
+      timeMin: dayStart.toISOString(),
+      timeMax: dayEnd.toISOString(),
+      singleEvents: true,
+      orderBy: 'startTime',
+    });
+
+    events = (res.data.items || [])
+      .filter(e => e.start?.dateTime)
+      .map(e => ({
+        start: new Date(e.start.dateTime),
+        end:   new Date(e.end.dateTime),
+      }));
+  } catch (err) {
+    console.error('Erreur Google Calendar:', err);
+    return { statusCode: 500, headers: CORS_HEADERS, body: JSON.stringify({ error: 'Erreur lors de la récupération du calendrier' }) };
+  }
+
   const dow = new Date(date + 'T12:00:00Z').getDay();
   const isWeekend = dow === 0 || dow === 6;
   const startHour = isWeekend ? 9 : 8;
@@ -75,44 +99,24 @@ exports.handler = async (event) => {
 
   const cutoffUTC = torontoToUTC(date, `${String(endHour).padStart(2,'0')}:00`);
 
-  // Construire la liste des créneaux avec leurs plages UTC
-  const slotRanges = [];
+  const slots = [];
+
   for (let minOfDay = startHour * 60; minOfDay < endHour * 60; minOfDay += 30) {
     const hh = String(Math.floor(minOfDay / 60)).padStart(2, '0');
     const mm = String(minOfDay % 60).padStart(2, '0');
     const slotTime = `${hh}:${mm}`;
+
     const slotStart = torontoToUTC(date, slotTime);
     const slotEnd   = new Date(slotStart.getTime() + totalBlockMin * 60 * 1000);
-    slotRanges.push({ time: slotTime, slotStart, slotEnd });
+
+    if (slotEnd > cutoffUTC) {
+      slots.push({ time: slotTime, available: false });
+      continue;
+    }
+
+    const hasConflict = events.some(e => e.start < slotEnd && e.end > slotStart);
+    slots.push({ time: slotTime, available: !hasConflict });
   }
-
-  // Une seule requête freebusy pour toute la journée
-  const dayStart = torontoToUTC(date, `${String(startHour).padStart(2,'0')}:00`);
-  const dayEnd   = cutoffUTC;
-
-  let busyRanges = [];
-  try {
-    const fb = await calendar.freebusy.query({
-      requestBody: {
-        timeMin: dayStart.toISOString(),
-        timeMax: dayEnd.toISOString(),
-        items: [{ id: process.env.GOOGLE_CALENDAR_ID }],
-      },
-    });
-    busyRanges = (fb.data.calendars[process.env.GOOGLE_CALENDAR_ID]?.busy ?? []).map(b => ({
-      start: new Date(b.start),
-      end:   new Date(b.end),
-    }));
-  } catch (err) {
-    console.error('Erreur freebusy:', err);
-    return { statusCode: 500, headers: CORS_HEADERS, body: JSON.stringify({ error: 'Erreur lors de la récupération du calendrier' }) };
-  }
-
-  const slots = slotRanges.map(({ time, slotStart, slotEnd }) => {
-    if (slotEnd > cutoffUTC) return { time, available: false };
-    const busy = busyRanges.some(b => b.start < slotEnd && b.end > slotStart);
-    return { time, available: !busy };
-  });
 
   return {
     statusCode: 200,
