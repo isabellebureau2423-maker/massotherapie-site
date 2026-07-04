@@ -339,6 +339,7 @@
   font-size: 0.9rem;
   color: var(--color-text-light);
 }
+.slots-loading[hidden] { display: none; }
 
 .spinner {
   width: 22px;
