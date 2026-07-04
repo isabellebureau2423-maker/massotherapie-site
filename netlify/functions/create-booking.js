@@ -25,7 +25,7 @@ exports.handler = async (event) => {
 
   const { prenom, nom, telephone, courriel, duree, date, heure } = body;
 
-  if (!prenom || !nom || !courriel || !duree || !date || !heure) {
+  if (!prenom || !courriel || !duree || !date || !heure) {
     return {
       statusCode: 400,
       headers: CORS_HEADERS,
