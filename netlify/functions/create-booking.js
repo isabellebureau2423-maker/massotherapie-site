@@ -186,8 +186,7 @@ exports.handler = async (event) => {
                 Pour toute question ou modification, n'hésitez pas à me contacter :
               </p>
               <p style="margin: 0 0 28px;">
-                <a href="mailto:${process.env.GMAIL_USER}" style="color: #2A5446; font-weight: 600;">${process.env.GMAIL_USER}</a>
-                &nbsp;·&nbsp; Texto : <strong>438-939-8359</strong>
+                Texto : <strong>438-939-8359</strong>
               </p>
               <div style="background: #f9f6ee; border: 1px solid #e8d9a0; border-radius: 10px; padding: 20px 24px; margin-bottom: 28px; text-align: center;">
                 <p style="margin: 0 0 6px; color: #1A2E25; font-weight: 600; font-size: 1rem;">⭐ Après votre séance…</p>
