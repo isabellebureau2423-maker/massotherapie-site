@@ -148,7 +148,7 @@ exports.handler = async (event) => {
 
   return {
     statusCode: 200,
-    headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' },
+    headers: { ...CORS_HEADERS, 'Content-Type': 'application/json', 'Cache-Control': 'no-store' },
     body: JSON.stringify({ slots }),
   };
 };
