@@ -7,6 +7,39 @@ const CORS_HEADERS = {
   'Access-Control-Allow-Methods': 'POST, OPTIONS',
 };
 
+const TZ = 'America/Toronto';
+
+// Retourne l'offset UTC→Toronto en minutes (ex: -240 pour EDT)
+function getTorontoOffsetMinutes(utcDate) {
+  const parts = new Intl.DateTimeFormat('en-US', {
+    timeZone: TZ,
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false,
+  }).formatToParts(utcDate);
+
+  const utcH = utcDate.getUTCHours();
+  const utcM = utcDate.getUTCMinutes();
+  let torH = parseInt(parts.find(p => p.type === 'hour').value);
+  const torM = parseInt(parts.find(p => p.type === 'minute').value);
+  if (torH === 24) torH = 0;
+
+  let offset = (torH * 60 + torM) - (utcH * 60 + utcM);
+  if (offset > 12 * 60) offset -= 24 * 60;
+  if (offset < -12 * 60) offset += 24 * 60;
+  return offset;
+}
+
+// Convertit une heure locale Toronto (YYYY-MM-DD + HH:MM) en Date UTC
+function torontoToUTC(dateStr, hhmm) {
+  const noonUTC = new Date(`${dateStr}T12:00:00Z`);
+  const offsetMin = getTorontoOffsetMinutes(noonUTC);
+  const [h, m] = hhmm.split(':').map(Number);
+  const [y, mo, d] = dateStr.split('-').map(Number);
+  const utcTotalMin = h * 60 + m - offsetMin;
+  return new Date(Date.UTC(y, mo - 1, d, Math.floor(utcTotalMin / 60), utcTotalMin % 60, 0));
+}
+
 exports.handler = async (event) => {
   if (event.httpMethod === 'OPTIONS') {
     return { statusCode: 204, headers: CORS_HEADERS, body: '' };
@@ -33,8 +66,8 @@ exports.handler = async (event) => {
     };
   }
 
-  // Construire les dates ISO
-  const startDateTime = new Date(`${date}T${heure}:00`);
+  // Convertir l'heure Toronto → UTC correctement
+  const startDateTime = torontoToUTC(date, heure);
   const endDateTime = new Date(startDateTime.getTime() + (Number(duree) + 30) * 60 * 1000);
 
   // Auth Google Calendar via Service Account
@@ -78,10 +111,10 @@ exports.handler = async (event) => {
     await calendar.events.insert({
       calendarId: process.env.GOOGLE_CALENDAR_ID,
       requestBody: {
-        summary: `Kinésia Relief — ${prenom} ${nom} (${duree} min)`,
+        summary: `Kinésia Relief — ${prenom} ${nom || ''} (${duree} min)`,
         description: `Téléphone: ${telephone || 'non fourni'}\nCourriel: ${courriel}\nDurée: ${duree} min`,
-        start: { dateTime: startDateTime.toISOString() },
-        end: { dateTime: endDateTime.toISOString() },
+        start: { dateTime: startDateTime.toISOString(), timeZone: TZ },
+        end: { dateTime: endDateTime.toISOString(), timeZone: TZ },
         colorId: '2',
       },
     });
@@ -104,7 +137,8 @@ exports.handler = async (event) => {
       },
     });
 
-    const dateFormatted = new Date(`${date}T${heure}:00`).toLocaleDateString('fr-CA', {
+    const dateFormatted = new Date(`${date}T12:00:00Z`).toLocaleDateString('fr-CA', {
+      timeZone: TZ,
       weekday: 'long',
       year: 'numeric',
       month: 'long',
@@ -112,8 +146,12 @@ exports.handler = async (event) => {
     });
 
     const heureFormatted = heure;
-    const heureFinDate = new Date(startDateTime.getTime() + Number(duree) * 60 * 1000);
-    const heureFinFormatted = heureFinDate.toLocaleTimeString('fr-CA', { hour: '2-digit', minute: '2-digit' });
+    const heureFinUTC = new Date(startDateTime.getTime() + Number(duree) * 60 * 1000);
+    const heureFinFormatted = heureFinUTC.toLocaleTimeString('fr-CA', {
+      timeZone: TZ,
+      hour: '2-digit',
+      minute: '2-digit',
+    });
 
     await transporter.sendMail({
       from: `"Kinésia Relief — Isabelle Bureau" <${process.env.GMAIL_USER}>`,
