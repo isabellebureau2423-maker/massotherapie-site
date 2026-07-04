@@ -672,5 +672,17 @@
 
   })();
   </script>
+
+  <a href="index.html" id="backHomeBtn" class="back-home-btn" aria-label="Retour à l'accueil">← Accueil</a>
+  <script>
+    (function () {
+      const btn = document.getElementById('backHomeBtn');
+      function updateBtn() {
+        btn.classList.toggle('visible', window.scrollY > 300);
+      }
+      window.addEventListener('scroll', updateBtn, { passive: true });
+      updateBtn();
+    })();
+  </script>
 </body>
 </html>
