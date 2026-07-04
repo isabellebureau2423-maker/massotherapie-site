@@ -189,6 +189,11 @@ exports.handler = async (event) => {
                 <a href="mailto:${process.env.GMAIL_USER}" style="color: #2A5446; font-weight: 600;">${process.env.GMAIL_USER}</a>
                 &nbsp;·&nbsp; Texto : <strong>438-939-8359</strong>
               </p>
+              <div style="background: #f9f6ee; border: 1px solid #e8d9a0; border-radius: 10px; padding: 20px 24px; margin-bottom: 28px; text-align: center;">
+                <p style="margin: 0 0 6px; color: #1A2E25; font-weight: 600; font-size: 1rem;">⭐ Vous avez aimé votre séance ?</p>
+                <p style="margin: 0 0 16px; color: #5A4A1A; font-size: 0.88rem; line-height: 1.5;">Votre avis Google m'aide énormément à faire connaître Kinésia Relief. Merci du fond du cœur !</p>
+                <a href="https://share.google/JAIxut0FPTkd6aZoL" style="display: inline-block; background: #D4AF5A; color: #1A1A18; font-weight: 700; font-size: 0.9rem; text-decoration: none; padding: 12px 28px; border-radius: 100px;">Laisser un avis 5 étoiles</a>
+              </div>
               <p style="color: #3A5E50; line-height: 1.65; margin: 0;">
                 Au plaisir de vous accueillir,<br />
                 <strong style="color: #1A2E25;">Isabelle Bureau Mistral</strong><br />
