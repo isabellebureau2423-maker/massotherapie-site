@@ -432,7 +432,7 @@
       setTimeout(() => step4.scrollIntoView({ behavior: 'smooth', block: 'start' }), 80);
 
       try {
-        const res  = await fetch(`/.netlify/functions/get-availability?date=${selectedDate}&duree=${duree}`);
+        const res  = await fetch(`/.netlify/functions/get-availability?date=${selectedDate}&duree=${duree}&t=${Date.now()}`, { cache: 'no-store' });
         const data = await res.json();
         spinner.hidden = true;
 
@@ -579,7 +579,15 @@
           return;
         }
 
-        // SUCCESS
+        // SUCCESS — griser immédiatement le créneau réservé dans la grille
+        document.querySelectorAll('.slot-pill').forEach(p => {
+          if (p.textContent.trim() === selectedTime) {
+            p.classList.remove('slot-pill--selected');
+            p.classList.add('slot-pill--unavailable');
+            p.disabled = true;
+          }
+        });
+
         const dateFormatted = formatDateFr(selectedDate);
         document.getElementById('confirmPrenom').textContent   = payload.prenom;
         document.getElementById('confirmSoin').textContent     = payload.service;
