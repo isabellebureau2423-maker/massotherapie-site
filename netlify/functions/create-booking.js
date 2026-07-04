@@ -182,8 +182,14 @@ exports.handler = async (event) => {
                   📍 <strong>Adresse :</strong> 1030 rue Saint-Paul, appartement 102, Saint-Rémi
                 </p>
               </div>
+              <div style="background: #fff8f6; border: 1px solid #f0c8b0; border-radius: 10px; padding: 18px 22px; margin-bottom: 24px;">
+                <p style="margin: 0 0 6px; color: #1A2E25; font-weight: 700; font-size: 0.95rem;">⚠️ Politique d'annulation</p>
+                <p style="margin: 0; color: #7A3A1A; font-size: 0.88rem; line-height: 1.6;">
+                  Pour annuler ou modifier votre rendez-vous, vous devez nous contacter au moins <strong>24 heures à l'avance</strong>. Passé ce délai, la séance est considérée comme effectuée.
+                </p>
+              </div>
               <p style="color: #3A5E50; line-height: 1.65; margin: 0 0 8px;">
-                Pour toute question ou modification, n'hésitez pas à me contacter :
+                Pour toute question ou annulation, contactez-moi par texto :
               </p>
               <p style="margin: 0 0 28px;">
                 Texto : <strong>438-939-8359</strong>
