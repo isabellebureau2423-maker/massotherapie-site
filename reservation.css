@@ -391,9 +391,10 @@
 }
 
 .slot-pill--unavailable {
-  background-color: #c8c8c8 !important;
-  color: #888888 !important;
-  border: 1px solid #b0b0b0 !important;
+  background-color: #9a9a9a !important;
+  color: #3a3a3a !important;
+  border: 1px solid #787878 !important;
+  text-decoration: line-through;
   cursor: not-allowed !important;
   opacity: 0.5 !important;
   text-decoration: line-through !important;
