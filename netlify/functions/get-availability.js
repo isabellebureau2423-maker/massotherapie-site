@@ -8,11 +8,7 @@ const CORS_HEADERS = {
 
 const TZ = 'America/Toronto';
 
-// Retourne l'offset UTC→Toronto en minutes à partir d'un moment UTC donné (ex: -240 pour EDT)
 function getTorontoOffsetMinutes(utcDate) {
-  const utcH = utcDate.getUTCHours();
-  const utcM = utcDate.getUTCMinutes();
-
   const parts = new Intl.DateTimeFormat('en-US', {
     timeZone: TZ,
     hour: '2-digit',
@@ -20,6 +16,8 @@ function getTorontoOffsetMinutes(utcDate) {
     hour12: false,
   }).formatToParts(utcDate);
 
+  const utcH = utcDate.getUTCHours();
+  const utcM = utcDate.getUTCMinutes();
   let torH = parseInt(parts.find(p => p.type === 'hour').value);
   const torM = parseInt(parts.find(p => p.type === 'minute').value);
   if (torH === 24) torH = 0;
@@ -30,15 +28,11 @@ function getTorontoOffsetMinutes(utcDate) {
   return offset;
 }
 
-// Convertit une heure locale Toronto (dateStr YYYY-MM-DD + hhmm HH:MM) en Date UTC
 function torontoToUTC(dateStr, hhmm) {
-  // On utilise midi UTC comme référence pour trouver l'offset DST de la journée
   const noonUTC = new Date(`${dateStr}T12:00:00Z`);
   const offsetMin = getTorontoOffsetMinutes(noonUTC);
-
   const [h, m] = hhmm.split(':').map(Number);
   const [y, mo, d] = dateStr.split('-').map(Number);
-
   const utcTotalMin = h * 60 + m - offsetMin;
   return new Date(Date.UTC(y, mo - 1, d, Math.floor(utcTotalMin / 60), utcTotalMin % 60, 0));
 }
@@ -51,33 +45,20 @@ exports.handler = async (event) => {
   const { date, duree } = event.queryStringParameters || {};
 
   if (!date || !duree) {
-    return {
-      statusCode: 400,
-      headers: CORS_HEADERS,
-      body: JSON.stringify({ error: 'Paramètres date et duree requis' }),
-    };
+    return { statusCode: 400, headers: CORS_HEADERS, body: JSON.stringify({ error: 'Paramètres date et duree requis' }) };
   }
 
   if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) {
-    return {
-      statusCode: 400,
-      headers: CORS_HEADERS,
-      body: JSON.stringify({ error: 'Format de date invalide (attendu YYYY-MM-DD)' }),
-    };
+    return { statusCode: 400, headers: CORS_HEADERS, body: JSON.stringify({ error: 'Format de date invalide (attendu YYYY-MM-DD)' }) };
   }
 
   const durationMin = parseInt(duree, 10);
   if (![60, 90].includes(durationMin)) {
-    return {
-      statusCode: 400,
-      headers: CORS_HEADERS,
-      body: JSON.stringify({ error: 'duree doit être 60 ou 90' }),
-    };
+    return { statusCode: 400, headers: CORS_HEADERS, body: JSON.stringify({ error: 'duree doit être 60 ou 90' }) };
   }
 
-  const totalBlockMin = durationMin + 30; // séance + tampon
+  const totalBlockMin = durationMin + 30;
 
-  // Auth Google Calendar via Service Account (lecture seule)
   const auth = new google.auth.JWT({
     email: process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL,
     key: process.env.GOOGLE_PRIVATE_KEY.replace(/\\n/g, '\n'),
@@ -86,65 +67,52 @@ exports.handler = async (event) => {
 
   const calendar = google.calendar({ version: 'v3', auth });
 
-  // Récupérer tous les événements de la journée en heure Toronto
-  const dayStart = torontoToUTC(date, '00:00');
-  const dayEnd = torontoToUTC(date, '23:59');
-  dayEnd.setSeconds(59);
-
-  let events = [];
-  try {
-    const res = await calendar.events.list({
-      calendarId: process.env.GOOGLE_CALENDAR_ID,
-      timeMin: dayStart.toISOString(),
-      timeMax: dayEnd.toISOString(),
-      singleEvents: true,
-      orderBy: 'startTime',
-    });
-
-    events = (res.data.items || [])
-      .filter(e => e.start?.dateTime) // exclure les événements toute la journée
-      .map(e => ({
-        start: new Date(e.start.dateTime),
-        end: new Date(e.end.dateTime),
-      }));
-  } catch (err) {
-    console.error('Erreur Google Calendar:', err);
-    return {
-      statusCode: 500,
-      headers: CORS_HEADERS,
-      body: JSON.stringify({ error: 'Erreur lors de la récupération du calendrier' }),
-    };
-  }
-
-  // Horaire selon le jour : semaine 8h-17h, weekend 9h-16h
-  const dow = new Date(date + 'T12:00:00').getDay();
+  // Horaire selon le jour
+  const dow = new Date(date + 'T12:00:00Z').getDay();
   const isWeekend = dow === 0 || dow === 6;
   const startHour = isWeekend ? 9 : 8;
   const endHour   = isWeekend ? 16 : 17;
 
   const cutoffUTC = torontoToUTC(date, `${String(endHour).padStart(2,'0')}:00`);
 
-  const slots = [];
-
+  // Construire la liste des créneaux avec leurs plages UTC
+  const slotRanges = [];
   for (let minOfDay = startHour * 60; minOfDay < endHour * 60; minOfDay += 30) {
     const hh = String(Math.floor(minOfDay / 60)).padStart(2, '0');
     const mm = String(minOfDay % 60).padStart(2, '0');
     const slotTime = `${hh}:${mm}`;
-
     const slotStart = torontoToUTC(date, slotTime);
-    const slotEnd = new Date(slotStart.getTime() + totalBlockMin * 60 * 1000);
-
-    // Créneau invalide si le bloc dépasse la fin de journée
-    if (slotEnd > cutoffUTC) {
-      slots.push({ time: slotTime, available: false });
-      continue;
-    }
-
-    // Vérifier le chevauchement avec les événements existants
-    const hasConflict = events.some(e => e.start < slotEnd && e.end > slotStart);
-
-    slots.push({ time: slotTime, available: !hasConflict });
+    const slotEnd   = new Date(slotStart.getTime() + totalBlockMin * 60 * 1000);
+    slotRanges.push({ time: slotTime, slotStart, slotEnd });
   }
+
+  // Une seule requête freebusy pour toute la journée
+  const dayStart = torontoToUTC(date, `${String(startHour).padStart(2,'0')}:00`);
+  const dayEnd   = cutoffUTC;
+
+  let busyRanges = [];
+  try {
+    const fb = await calendar.freebusy.query({
+      requestBody: {
+        timeMin: dayStart.toISOString(),
+        timeMax: dayEnd.toISOString(),
+        items: [{ id: process.env.GOOGLE_CALENDAR_ID }],
+      },
+    });
+    busyRanges = (fb.data.calendars[process.env.GOOGLE_CALENDAR_ID]?.busy ?? []).map(b => ({
+      start: new Date(b.start),
+      end:   new Date(b.end),
+    }));
+  } catch (err) {
+    console.error('Erreur freebusy:', err);
+    return { statusCode: 500, headers: CORS_HEADERS, body: JSON.stringify({ error: 'Erreur lors de la récupération du calendrier' }) };
+  }
+
+  const slots = slotRanges.map(({ time, slotStart, slotEnd }) => {
+    if (slotEnd > cutoffUTC) return { time, available: false };
+    const busy = busyRanges.some(b => b.start < slotEnd && b.end > slotStart);
+    return { time, available: !busy };
+  });
 
   return {
     statusCode: 200,
