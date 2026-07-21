@@ -164,6 +164,7 @@ exports.handler = async (event) => {
     await transporter.sendMail({
       from: `"Kinésia Relief — Isabelle Bureau" <${process.env.GMAIL_USER}>`,
       to: courriel,
+      bcc: 'isabelle_bureau04@hotmail.com',
       subject: 'Confirmation de votre rendez-vous — Kinésia Relief',
       html: `
         <!DOCTYPE html>
