@@ -2,8 +2,12 @@
   "name": "kinesia-relief-site",
   "version": "1.0.0",
   "dependencies": {
+    "@netlify/blobs": "^10.7.10",
     "googleapis": "^140.0.0",
     "nodemailer": "^6.9.0",
     "twilio": "^5.0.0"
+  },
+  "devDependencies": {
+    "@netlify/functions": "^5.3.0"
   }
 }

@@ -1,5 +1,6 @@
 const { google } = require('googleapis');
 const nodemailer = require('nodemailer');
+const { getStore } = require('@netlify/blobs');
 
 const CORS_HEADERS = {
   'Access-Control-Allow-Origin': '*',
@@ -133,6 +134,25 @@ exports.handler = async (event) => {
       headers: CORS_HEADERS,
       body: JSON.stringify({ error: 'Erreur lors de la création du rendez-vous' }),
     };
+  }
+
+  // Enregistrer le rendez-vous dans Netlify Blobs (pour l'envoi automatique de l'avis Google)
+  try {
+    const store = getStore('kinesia');
+    const appointments = (await store.get('appointments', { type: 'json' })) || [];
+    appointments.push({
+      prenom,
+      nom: nom || '',
+      courriel,
+      date,
+      heure,
+      duree: Number(duree),
+      reviewSent: false,
+    });
+    await store.setJSON('appointments', appointments);
+  } catch (err) {
+    console.error('Erreur enregistrement rendez-vous (blob):', err);
+    // On ne bloque pas la réponse si l'enregistrement échoue — le RDV est déjà créé
   }
 
   // Envoyer le courriel de confirmation
