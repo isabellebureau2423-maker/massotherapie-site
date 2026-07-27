@@ -78,6 +78,18 @@ export default async () => {
         to: appt.courriel,
         bcc: 'isabelle_bureau04@hotmail.com',
         subject: 'Merci pour votre visite — Kinésia Relief 💚',
+        text:
+          `Bonjour ${appt.prenom},\n\n` +
+          `Merci d'avoir choisi Kinésia Relief pour votre séance de ${appt.duree} minutes aujourd'hui. ` +
+          `J'espère que vous vous sentez déjà mieux !\n\n` +
+          `Si vous avez apprécié votre expérience, j'aimerais beaucoup que vous partagiez votre avis sur Google — ` +
+          `cela m'aide énormément à faire connaître ma pratique.\n\n` +
+          `Laisser un avis Google : https://share.google/JAIxut0FPTkd6aZoL\n\n` +
+          `Merci du fond du cœur,\n` +
+          `Isabelle Bureau\n` +
+          `Massothérapeute & Kinésithérapeute\n` +
+          `Kinésia Relief — Saint-Rémi, Québec\n` +
+          `438-939-8359`,
         html: `
           <!DOCTYPE html>
           <html lang="fr">
