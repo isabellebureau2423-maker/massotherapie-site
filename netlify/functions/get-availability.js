@@ -8,6 +8,11 @@ const CORS_HEADERS = {
 
 const TZ = 'America/Toronto';
 
+const BLOCKED_DATES = [
+  "2026-08-04",
+  "2026-08-05"
+];
+
 function getTorontoOffsetMinutes(utcDate) {
   const parts = new Intl.DateTimeFormat('en-US', {
     timeZone: TZ,
@@ -55,6 +60,14 @@ exports.handler = async (event) => {
   const durationMin = parseInt(duree, 10);
   if (![60, 90].includes(durationMin)) {
     return { statusCode: 400, headers: CORS_HEADERS, body: JSON.stringify({ error: 'duree doit être 60 ou 90' }) };
+  }
+
+  if (BLOCKED_DATES.includes(date)) {
+    return {
+      statusCode: 200,
+      headers: { "Access-Control-Allow-Origin": "*" },
+      body: JSON.stringify({ slots: [], blocked: true, message: "Aucune disponibilité ce jour" })
+    };
   }
 
   const totalBlockMin = durationMin + 30;
