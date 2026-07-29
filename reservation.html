@@ -441,11 +441,6 @@
           return;
         }
 
-        if (data.blocked) {
-          grid.innerHTML = '<p class="slots-empty" style="color:#b91c1c;background:#f3f4f6;">Congé — Aucune disponibilité</p>';
-          return;
-        }
-
         const anyAvailable = data.slots.some(s => s.available);
         if (!anyAvailable) {
           grid.innerHTML = '<p class="slots-empty">Aucun créneau disponible ce jour — choisissez une autre date.</p>';
