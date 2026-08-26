@@ -801,6 +801,13 @@ ul { list-style: none; }
   border: 1px solid rgba(255,255,255,0.35);
 }
 
+.plage__heure--pris {
+  background: rgba(0,0,0,0.25) !important;
+  color: rgba(255,255,255,0.4) !important;
+  border-color: rgba(255,255,255,0.1) !important;
+  text-decoration: line-through;
+}
+
 .plage__complet {
   display: block;
   background: rgba(0,0,0,0.06);
