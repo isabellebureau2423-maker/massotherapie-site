@@ -141,7 +141,9 @@ exports.handler = async (event) => {
   let intakeToken = null;
   let intakeCompleted = false;
   try {
+    console.log('Blobs: tentative getStore kinesia-clients');
     const clientStore = getStore('kinesia-clients');
+    console.log('Blobs: getStore OK');
     const clientKey = courriel.toLowerCase().trim();
     const existingClient = await clientStore.get(clientKey, { type: 'json' });
     if (existingClient) {
@@ -173,7 +175,7 @@ exports.handler = async (event) => {
       });
     }
   } catch (err) {
-    console.error('Erreur dossier client:', err);
+    console.error('Erreur dossier client:', err.message, err.stack);
   }
 
   // Enregistrer le rendez-vous dans Netlify Blobs (pour l'envoi automatique de l'avis Google)
