@@ -1,3 +1,4 @@
+﻿const crypto = require('crypto');
 const { google } = require('googleapis');
 const nodemailer = require('nodemailer');
 const { getStore } = require('@netlify/blobs');
@@ -136,6 +137,45 @@ exports.handler = async (event) => {
     };
   }
 
+  // Créer ou mettre à jour le dossier client
+  let intakeToken = null;
+  let intakeCompleted = false;
+  try {
+    const clientStore = getStore('kinesia-clients');
+    const clientKey = courriel.toLowerCase().trim();
+    const existingClient = await clientStore.get(clientKey, { type: 'json' });
+    if (existingClient) {
+      intakeToken = existingClient.intakeToken;
+      intakeCompleted = !!existingClient.intakeCompleted;
+      if (!existingClient.appointments) existingClient.appointments = [];
+      existingClient.appointments.push({ date, heure, duree: Number(duree) });
+      existingClient.updatedAt = new Date().toISOString();
+      await clientStore.setJSON(clientKey, existingClient);
+    } else {
+      intakeToken = crypto.randomBytes(20).toString('hex');
+      await clientStore.setJSON(clientKey, {
+        prenom,
+        nom: nom || '',
+        courriel,
+        telephone: telephone || '',
+        dateNaissance: '',
+        allergies: '',
+        conditionsMedicales: '',
+        medicaments: '',
+        contreIndications: '',
+        blessures: '',
+        autresInfos: '',
+        notes: [],
+        appointments: [{ date, heure, duree: Number(duree) }],
+        intakeToken,
+        intakeCompleted: false,
+        createdAt: new Date().toISOString(),
+      });
+    }
+  } catch (err) {
+    console.error('Erreur dossier client:', err);
+  }
+
   // Enregistrer le rendez-vous dans Netlify Blobs (pour l'envoi automatique de l'avis Google)
   try {
     const store = getStore('kinesia');
@@ -223,6 +263,14 @@ exports.handler = async (event) => {
               <p style="margin: 0 0 28px;">
                 Texto : <strong>438-939-8359</strong>
               </p>
+              ${intakeToken && !intakeCompleted ? `
+              <div style="background: #eef7f4; border: 1px solid #a0d4c0; border-radius: 10px; padding: 18px 22px; margin-bottom: 24px;">
+                <p style="margin: 0 0 6px; color: #1A2E25; font-weight: 700; font-size: 0.95rem;">📋 Votre dossier santé</p>
+                <p style="margin: 0 0 14px; color: #2A5446; font-size: 0.88rem; line-height: 1.6;">
+                  Pour que je puisse vous offrir la meilleure séance possible, merci de remplir votre questionnaire santé avant votre rendez-vous.
+                </p>
+                <a href="https://massotherapie-kinesiarelief.netlify.app/intake.html?token=${intakeToken}" style="display:inline-block;background:#2A5446;color:#fff;font-weight:700;font-size:0.88rem;text-decoration:none;padding:10px 24px;border-radius:100px;">Remplir mon dossier santé</a>
+              </div>` : ''}
               <div style="background: #f9f6ee; border: 1px solid #e8d9a0; border-radius: 10px; padding: 20px 24px; margin-bottom: 28px; text-align: center;">
                 <p style="margin: 0 0 6px; color: #1A2E25; font-weight: 600; font-size: 1rem;">⭐ Après votre séance…</p>
                 <p style="margin: 0 0 16px; color: #5A4A1A; font-size: 0.88rem; line-height: 1.5;">Si vous avez aimé votre expérience, un avis Google m'aide énormément à faire connaître Kinésia Relief. Merci du fond du cœur !</p>

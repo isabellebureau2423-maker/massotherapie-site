@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dossier santé — Kinésia Relief</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Inter', system-ui, sans-serif; background: #f5f5f0; color: #1A2E25; line-height: 1.65; }
+    .header { background: linear-gradient(135deg, #1A1A18, #2A5446); padding: 28px 24px; text-align: center; }
+    .header h1 { font-family: 'Playfair Display', Georgia, serif; color: #D4AF5A; font-size: 1.5rem; margin-bottom: 4px; }
+    .header p { color: rgba(255,255,255,0.6); font-size: 0.85rem; }
+    .container { max-width: 620px; margin: 0 auto; padding: 40px 24px 60px; }
+    .card { background: #fff; border-radius: 14px; padding: 28px 32px; margin-bottom: 20px; box-shadow: 0 2px 16px rgba(0,0,0,0.06); }
+    .card h2 { font-family: 'Playfair Display', serif; font-size: 1.1rem; color: #1A2E25; margin-bottom: 18px; padding-bottom: 12px; border-bottom: 2px solid #e8f0ec; }
+    label { display: block; font-size: 0.88rem; font-weight: 600; color: #2A5446; margin-bottom: 6px; margin-top: 16px; }
+    label:first-of-type { margin-top: 0; }
+    input, textarea, select {
+      width: 100%; padding: 11px 14px; border: 1.5px solid #c8ddd5; border-radius: 8px;
+      font-family: inherit; font-size: 0.92rem; color: #1A2E25; background: #fafcfb;
+      transition: border-color 0.2s;
+    }
+    input:focus, textarea:focus { outline: none; border-color: #2A5446; background: #fff; }
+    textarea { min-height: 80px; resize: vertical; }
+    .hint { font-size: 0.78rem; color: #7AAF98; margin-top: 4px; }
+    .btn-submit {
+      width: 100%; padding: 15px; background: #2A5446; color: #fff; border: none;
+      border-radius: 100px; font-size: 1rem; font-weight: 600; cursor: pointer;
+      transition: background 0.2s, transform 0.1s; margin-top: 8px;
+    }
+    .btn-submit:hover { background: #1A3430; transform: translateY(-1px); }
+    .btn-submit:disabled { background: #9a9a9a; cursor: not-allowed; transform: none; }
+    #loading, #success, #error, #invalid { display: none; }
+    #loading { text-align: center; padding: 60px 24px; color: #2A5446; }
+    #success { text-align: center; padding: 60px 24px; }
+    #success .check { font-size: 3rem; margin-bottom: 16px; }
+    #success h2 { font-family: 'Playfair Display', serif; color: #1A2E25; margin-bottom: 12px; }
+    #success p { color: #3A5E50; }
+    #error-msg { background: #fff0f0; border: 1px solid #f0c8c8; border-radius: 8px; padding: 12px 16px; color: #8A2020; font-size: 0.88rem; margin-bottom: 16px; display: none; }
+    .required { color: #B8922A; }
+    @media (max-width: 480px) { .card { padding: 20px; } }
+  </style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Kinésia Relief</h1>
+  <p>Isabelle Bureau Mistral · Massothérapeute</p>
+</div>
+
+<div id="loading">
+  <p>Chargement de votre dossier…</p>
+</div>
+
+<div id="invalid" style="text-align:center;padding:60px 24px;">
+  <p style="font-size:2rem;margin-bottom:16px;">⚠️</p>
+  <h2 style="font-family:'Playfair Display',serif;margin-bottom:12px;">Lien invalide</h2>
+  <p style="color:#3A5E50;">Ce lien est invalide ou a déjà été utilisé. Contactez Isabelle au <strong>438-939-8359</strong>.</p>
+</div>
+
+<div id="success">
+  <div class="check">✅</div>
+  <h2>Dossier reçu, merci !</h2>
+  <p>Isabelle a maintenant accès à vos informations de santé.<br>À bientôt pour votre séance !</p>
+</div>
+
+<div id="formArea">
+  <div class="container">
+    <div class="card" style="background:linear-gradient(135deg,#f0f7f4,#e8f5ee);border:1px solid #b8ddd0;">
+      <p style="color:#1A2E25;font-size:0.95rem;">Bonjour <strong id="prenomClient"></strong> 👋</p>
+      <p style="color:#3A5E50;font-size:0.88rem;margin-top:8px;">Ce formulaire aide Isabelle à personnaliser votre séance. Toutes les informations restent strictement confidentielles.</p>
+    </div>
+
+    <div id="error-msg"></div>
+
+    <form id="intakeForm">
+      <div class="card">
+        <h2>📅 Informations personnelles</h2>
+        <label>Date de naissance <span class="required">*</span></label>
+        <input type="date" id="dateNaissance" required />
+      </div>
+
+      <div class="card">
+        <h2>🏥 Santé &amp; conditions médicales</h2>
+
+        <label>Allergies connues</label>
+        <textarea id="allergies" placeholder="Ex : latex, noix, huiles essentielles, aucune…"></textarea>
+        <p class="hint">Inclure allergies alimentaires si elles peuvent affecter les soins</p>
+
+        <label>Conditions médicales actuelles</label>
+        <textarea id="conditionsMedicales" placeholder="Ex : diabète, hypertension, fibromyalgie, aucune…"></textarea>
+
+        <label>Médicaments pris régulièrement</label>
+        <textarea id="medicaments" placeholder="Ex : anticoagulants, cortisone, aucun…"></textarea>
+
+        <label>Contre-indications connues</label>
+        <textarea id="contreIndications" placeholder="Ex : phlébite, cancer actif, plaies ouvertes, aucune…"></textarea>
+      </div>
+
+      <div class="card">
+        <h2>💪 Blessures &amp; zones sensibles</h2>
+
+        <label>Blessures récentes ou cicatrices</label>
+        <textarea id="blessures" placeholder="Ex : entorse cheville (mars 2025), chirurgie genou (2023), aucune…"></textarea>
+
+        <label>Autres informations utiles</label>
+        <textarea id="autresInfos" placeholder="Ex : zones à éviter, préférences, douleurs chroniques, objectifs de la séance…"></textarea>
+      </div>
+
+      <button type="submit" class="btn-submit" id="submitBtn">Envoyer mon dossier santé</button>
+    </form>
+  </div>
+</div>
+
+<script>
+  const params = new URLSearchParams(window.location.search);
+  const token = params.get('token');
+
+  const $loading = document.getElementById('loading');
+  const $invalid = document.getElementById('invalid');
+  const $success = document.getElementById('success');
+  const $formArea = document.getElementById('formArea');
+  const $errorMsg = document.getElementById('error-msg');
+
+  function show(el) {
+    [$loading, $invalid, $success, $formArea].forEach(e => e.style.display = 'none');
+    el.style.display = 'block';
+  }
+
+  async function init() {
+    if (!token) { show($invalid); return; }
+    show($loading);
+    try {
+      const res = await fetch(`/.netlify/functions/client-intake?token=${encodeURIComponent(token)}`);
+      if (!res.ok) { show($invalid); return; }
+      const data = await res.json();
+      if (data.intakeCompleted) { show($success); return; }
+      document.getElementById('prenomClient').textContent = data.prenom || '';
+      show($formArea);
+    } catch { show($invalid); }
+  }
+
+  document.getElementById('intakeForm').addEventListener('submit', async e => {
+    e.preventDefault();
+    $errorMsg.style.display = 'none';
+    const btn = document.getElementById('submitBtn');
+    btn.disabled = true;
+    btn.textContent = 'Envoi en cours…';
+
+    const payload = {
+      dateNaissance: document.getElementById('dateNaissance').value,
+      allergies: document.getElementById('allergies').value.trim(),
+      conditionsMedicales: document.getElementById('conditionsMedicales').value.trim(),
+      medicaments: document.getElementById('medicaments').value.trim(),
+      contreIndications: document.getElementById('contreIndications').value.trim(),
+      blessures: document.getElementById('blessures').value.trim(),
+      autresInfos: document.getElementById('autresInfos').value.trim(),
+    };
+
+    try {
+      const res = await fetch(`/.netlify/functions/client-intake?token=${encodeURIComponent(token)}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      if (!res.ok) throw new Error();
+      show($success);
+    } catch {
+      $errorMsg.textContent = "Une erreur est survenue. Réessayez ou contactez Isabelle au 438-939-8359.";
+      $errorMsg.style.display = 'block';
+      btn.disabled = false;
+      btn.textContent = 'Envoyer mon dossier santé';
+    }
+  });
+
+  init();
+</script>
+</body>
+</html>

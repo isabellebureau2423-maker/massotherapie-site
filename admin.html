@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Espace admin — Kinésia Relief</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #0f1410; --sidebar: #141b16; --card: #1c2620; --accent: #2A5446;
+      --gold: #D4AF5A; --text: #e8f0ec; --muted: rgba(232,240,236,0.5);
+      --border: rgba(255,255,255,0.08); --radius: 10px;
+    }
+    body { font-family: 'Inter', system-ui, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+
+    /* LOGIN */
+    #loginView {
+      min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px;
+    }
+    .login-box {
+      background: var(--card); border: 1px solid var(--border); border-radius: 16px;
+      padding: 48px 40px; width: 100%; max-width: 380px; text-align: center;
+    }
+    .login-box h1 { font-family: 'Playfair Display', serif; color: var(--gold); font-size: 1.6rem; margin-bottom: 6px; }
+    .login-box p { color: var(--muted); font-size: 0.85rem; margin-bottom: 32px; }
+    .login-box input {
+      width: 100%; padding: 12px 16px; background: rgba(255,255,255,0.06); border: 1.5px solid var(--border);
+      border-radius: 8px; color: var(--text); font-size: 1rem; font-family: inherit; margin-bottom: 14px;
+    }
+    .login-box input:focus { outline: none; border-color: var(--accent); }
+    .btn-primary {
+      width: 100%; padding: 13px; background: var(--accent); color: #fff; border: none;
+      border-radius: 100px; font-size: 0.95rem; font-weight: 600; cursor: pointer; transition: background 0.2s;
+    }
+    .btn-primary:hover { background: #1A3430; }
+    .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+    #loginError { color: #f08080; font-size: 0.85rem; margin-top: 10px; display: none; }
+
+    /* DASHBOARD */
+    #dashboardView { display: none; height: 100vh; overflow: hidden; }
+    .dash { display: flex; height: 100%; }
+
+    /* SIDEBAR */
+    .sidebar {
+      width: 280px; min-width: 280px; background: var(--sidebar); border-right: 1px solid var(--border);
+      display: flex; flex-direction: column; height: 100%;
+    }
+    .sidebar__header {
+      padding: 20px 20px 16px; border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .sidebar__logo { font-family: 'Playfair Display', serif; color: var(--gold); font-size: 1.1rem; }
+    .sidebar__logout { background: none; border: 1px solid var(--border); color: var(--muted); border-radius: 6px; padding: 4px 10px; font-size: 0.75rem; cursor: pointer; }
+    .sidebar__logout:hover { color: var(--text); border-color: rgba(255,255,255,0.2); }
+    .sidebar__search {
+      padding: 12px 14px; margin: 12px; background: rgba(255,255,255,0.05); border: 1px solid var(--border);
+      border-radius: 8px; color: var(--text); font-family: inherit; font-size: 0.88rem;
+    }
+    .sidebar__search:focus { outline: none; border-color: var(--accent); }
+    .client-list { flex: 1; overflow-y: auto; padding: 0 8px 16px; }
+    .client-list::-webkit-scrollbar { width: 4px; }
+    .client-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+    .client-item {
+      padding: 12px 12px; border-radius: 8px; cursor: pointer; margin-bottom: 2px;
+      transition: background 0.15s; display: flex; align-items: center; gap: 10px;
+    }
+    .client-item:hover { background: rgba(255,255,255,0.06); }
+    .client-item.active { background: var(--accent); }
+    .client-item__avatar {
+      width: 36px; height: 36px; border-radius: 50%; background: rgba(212,175,90,0.2);
+      color: var(--gold); display: flex; align-items: center; justify-content: center;
+      font-weight: 700; font-size: 0.85rem; flex-shrink: 0;
+    }
+    .client-item__info { min-width: 0; }
+    .client-item__name { font-size: 0.9rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .client-item__meta { font-size: 0.75rem; color: var(--muted); margin-top: 2px; }
+    .client-item.active .client-item__meta { color: rgba(255,255,255,0.7); }
+    .badge { width: 8px; height: 8px; border-radius: 50%; background: #f0c050; flex-shrink: 0; margin-left: auto; }
+    .badge.done { background: #50c878; }
+    .empty-list { text-align: center; color: var(--muted); font-size: 0.85rem; padding: 40px 16px; }
+
+    /* MAIN CONTENT */
+    .main { flex: 1; overflow-y: auto; height: 100%; }
+    .main::-webkit-scrollbar { width: 4px; }
+    .main::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+    .welcome {
+      height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center;
+      color: var(--muted); text-align: center; padding: 40px;
+    }
+    .welcome h2 { font-family: 'Playfair Display', serif; color: var(--gold); font-size: 1.4rem; margin-bottom: 10px; }
+
+    /* CLIENT DETAIL */
+    .detail { padding: 28px 32px; max-width: 760px; }
+    .detail__header { display: flex; align-items: center; gap: 16px; margin-bottom: 28px; flex-wrap: wrap; }
+    .detail__avatar {
+      width: 56px; height: 56px; border-radius: 50%; background: rgba(212,175,90,0.2);
+      color: var(--gold); display: flex; align-items: center; justify-content: center;
+      font-weight: 700; font-size: 1.3rem;
+    }
+    .detail__name { font-family: 'Playfair Display', serif; font-size: 1.4rem; color: var(--text); }
+    .detail__email { font-size: 0.85rem; color: var(--muted); margin-top: 3px; }
+    .intake-badge {
+      margin-left: auto; padding: 5px 12px; border-radius: 100px; font-size: 0.75rem; font-weight: 600;
+    }
+    .intake-badge.done { background: rgba(80,200,120,0.15); color: #50c878; border: 1px solid rgba(80,200,120,0.3); }
+    .intake-badge.pending { background: rgba(240,192,80,0.15); color: #f0c050; border: 1px solid rgba(240,192,80,0.3); }
+
+    .section-title {
+      font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted);
+      margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid var(--border);
+    }
+    .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 24px; }
+    .info-block { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 16px; }
+    .info-block__label { font-size: 0.72rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 5px; }
+    .info-block__value { font-size: 0.92rem; color: var(--text); }
+    .info-block__value.empty { color: var(--muted); font-style: italic; font-size: 0.85rem; }
+
+    .section-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; margin-bottom: 20px; }
+
+    /* Intake health info */
+    .health-field { margin-bottom: 14px; }
+    .health-field:last-child { margin-bottom: 0; }
+    .health-field__label { font-size: 0.78rem; color: var(--muted); margin-bottom: 4px; }
+    .health-field__value { font-size: 0.9rem; color: var(--text); background: rgba(255,255,255,0.04); border-radius: 6px; padding: 8px 12px; line-height: 1.5; }
+    .health-field__value.empty { color: var(--muted); font-style: italic; }
+
+    /* Appointments */
+    .appt-list { display: flex; flex-direction: column; gap: 8px; }
+    .appt-item { background: rgba(255,255,255,0.04); border-radius: 8px; padding: 10px 14px; display: flex; justify-content: space-between; align-items: center; font-size: 0.88rem; }
+    .appt-item__date { color: var(--text); }
+    .appt-item__dur { color: var(--muted); font-size: 0.8rem; }
+
+    /* Notes */
+    .notes-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 16px; }
+    .note-item { background: rgba(255,255,255,0.04); border-radius: 8px; padding: 12px 14px; position: relative; }
+    .note-item__date { font-size: 0.75rem; color: var(--gold); margin-bottom: 5px; }
+    .note-item__text { font-size: 0.88rem; line-height: 1.6; white-space: pre-wrap; }
+    .note-item__del { position: absolute; top: 10px; right: 10px; background: none; border: none; color: var(--muted); cursor: pointer; font-size: 1rem; }
+    .note-item__del:hover { color: #f08080; }
+
+    .add-note-form { display: flex; flex-direction: column; gap: 10px; }
+    .add-note-form textarea {
+      background: rgba(255,255,255,0.06); border: 1.5px solid var(--border); border-radius: 8px;
+      color: var(--text); font-family: inherit; font-size: 0.88rem; padding: 10px 12px; resize: vertical; min-height: 80px;
+    }
+    .add-note-form textarea:focus { outline: none; border-color: var(--accent); }
+    .add-note-row { display: flex; gap: 10px; align-items: center; }
+    .add-note-row input[type="date"] {
+      background: rgba(255,255,255,0.06); border: 1.5px solid var(--border); border-radius: 8px;
+      color: var(--text); font-family: inherit; font-size: 0.85rem; padding: 8px 10px;
+    }
+    .btn-small {
+      padding: 8px 20px; background: var(--accent); color: #fff; border: none;
+      border-radius: 100px; font-size: 0.85rem; font-weight: 600; cursor: pointer; transition: background 0.2s;
+      white-space: nowrap;
+    }
+    .btn-small:hover { background: #1A3430; }
+    .btn-small:disabled { opacity: 0.5; }
+
+    /* Mobile */
+    #mobileBack { display: none; }
+    @media (max-width: 700px) {
+      .sidebar { width: 100%; position: fixed; top: 0; left: 0; z-index: 10; transform: translateX(0); transition: transform 0.3s; }
+      .sidebar.hidden { transform: translateX(-100%); }
+      .main { width: 100%; }
+      #mobileBack { display: flex; align-items: center; gap: 8px; background: none; border: 1px solid var(--border); color: var(--muted); border-radius: 8px; padding: 6px 12px; font-size: 0.82rem; cursor: pointer; margin-bottom: 20px; }
+      .detail { padding: 20px 16px; }
+      .info-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="loginView">
+  <div class="login-box">
+    <h1>Kinésia Relief</h1>
+    <p>Espace administration — accès réservé</p>
+    <input type="password" id="passwordInput" placeholder="Mot de passe" autocomplete="current-password" />
+    <button class="btn-primary" id="loginBtn">Connexion</button>
+    <div id="loginError">Mot de passe incorrect.</div>
+  </div>
+</div>
+
+<!-- DASHBOARD -->
+<div id="dashboardView">
+  <div class="dash">
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+      <div class="sidebar__header">
+        <span class="sidebar__logo">Kinésia Relief</span>
+        <button class="sidebar__logout" id="logoutBtn">Déconnexion</button>
+      </div>
+      <input type="search" class="sidebar__search" id="searchInput" placeholder="🔍  Rechercher un client…" />
+      <div class="client-list" id="clientList">
+        <div class="empty-list">Chargement…</div>
+      </div>
+    </div>
+
+    <!-- Main -->
+    <div class="main" id="mainContent">
+      <div class="welcome" id="welcomePanel">
+        <h2>Bonjour, Isabelle 👋</h2>
+        <p>Sélectionnez un client dans la liste pour voir son dossier.</p>
+      </div>
+      <div class="detail" id="detailPanel" style="display:none;">
+        <button id="mobileBack">← Retour à la liste</button>
+        <div id="detailContent"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const API = '/.netlify/functions';
+  let token = sessionStorage.getItem('admin_token');
+  let allClients = [];
+  let currentClientKey = null;
+
+  // ===== AUTH =====
+  function isLoggedIn() { return !!token; }
+
+  function showLogin() {
+    document.getElementById('loginView').style.display = 'flex';
+    document.getElementById('dashboardView').style.display = 'none';
+  }
+
+  function showDashboard() {
+    document.getElementById('loginView').style.display = 'none';
+    document.getElementById('dashboardView').style.display = 'block';
+    loadClients();
+  }
+
+  document.getElementById('loginBtn').addEventListener('click', doLogin);
+  document.getElementById('passwordInput').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
+
+  async function doLogin() {
+    const pw = document.getElementById('passwordInput').value;
+    const btn = document.getElementById('loginBtn');
+    const err = document.getElementById('loginError');
+    err.style.display = 'none';
+    btn.disabled = true;
+    btn.textContent = 'Connexion…';
+    try {
+      const res = await fetch(`${API}/admin-login`, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password: pw }),
+      });
+      if (!res.ok) throw new Error();
+      const data = await res.json();
+      token = data.token;
+      sessionStorage.setItem('admin_token', token);
+      showDashboard();
+    } catch {
+      err.style.display = 'block';
+      btn.disabled = false;
+      btn.textContent = 'Connexion';
+    }
+  }
+
+  document.getElementById('logoutBtn').addEventListener('click', () => {
+    sessionStorage.removeItem('admin_token');
+    token = null;
+    location.reload();
+  });
+
+  // ===== CLIENT LIST =====
+  async function loadClients() {
+    try {
+      const res = await fetch(`${API}/admin-clients?token=${encodeURIComponent(token)}`);
+      if (res.status === 401) { sessionStorage.removeItem('admin_token'); location.reload(); return; }
+      allClients = await res.json();
+      renderClientList(allClients);
+    } catch {
+      document.getElementById('clientList').innerHTML = '<div class="empty-list">Erreur de chargement.</div>';
+    }
+  }
+
+  function renderClientList(clients) {
+    const el = document.getElementById('clientList');
+    if (!clients.length) { el.innerHTML = '<div class="empty-list">Aucun client pour l\'instant.</div>'; return; }
+    el.innerHTML = clients.map(c => {
+      const initials = ((c.prenom[0] || '') + (c.nom[0] || '')).toUpperCase() || '?';
+      const lastDate = c.lastDate ? new Date(c.lastDate + 'T12:00:00Z').toLocaleDateString('fr-CA') : 'Aucun RDV';
+      return `<div class="client-item ${c.key === currentClientKey ? 'active' : ''}" data-key="${c.key}" onclick="selectClient('${c.key}')">
+        <div class="client-item__avatar">${initials}</div>
+        <div class="client-item__info">
+          <div class="client-item__name">${c.prenom} ${c.nom}</div>
+          <div class="client-item__meta">${c.totalSessions} séance${c.totalSessions !== 1 ? 's' : ''} · ${lastDate}</div>
+        </div>
+        <div class="badge ${c.intakeCompleted ? 'done' : ''}" title="${c.intakeCompleted ? 'Dossier santé complété' : 'En attente du dossier santé'}"></div>
+      </div>`;
+    }).join('');
+  }
+
+  document.getElementById('searchInput').addEventListener('input', e => {
+    const q = e.target.value.toLowerCase().trim();
+    const filtered = q ? allClients.filter(c => (c.prenom + ' ' + c.nom + ' ' + c.courriel).toLowerCase().includes(q)) : allClients;
+    renderClientList(filtered);
+  });
+
+  // ===== CLIENT DETAIL =====
+  async function selectClient(key) {
+    currentClientKey = key;
+    renderClientList(allClients);
+
+    const detail = document.getElementById('detailPanel');
+    const welcome = document.getElementById('welcomePanel');
+    detail.style.display = 'block';
+    welcome.style.display = 'none';
+    document.getElementById('detailContent').innerHTML = '<p style="color:var(--muted);padding:40px 0;text-align:center;">Chargement…</p>';
+
+    // Mobile: hide sidebar
+    if (window.innerWidth <= 700) {
+      document.getElementById('sidebar').classList.add('hidden');
+    }
+
+    try {
+      const res = await fetch(`${API}/admin-client-get?token=${encodeURIComponent(token)}&key=${encodeURIComponent(key)}`);
+      if (!res.ok) throw new Error();
+      const c = await res.json();
+      renderDetail(c, key);
+    } catch {
+      document.getElementById('detailContent').innerHTML = '<p style="color:#f08080;padding:20px;">Erreur de chargement du dossier.</p>';
+    }
+  }
+
+  document.getElementById('mobileBack').addEventListener('click', () => {
+    document.getElementById('sidebar').classList.remove('hidden');
+    document.getElementById('detailPanel').style.display = 'none';
+    document.getElementById('welcomePanel').style.display = 'flex';
+  });
+
+  function val(v) {
+    if (!v || v.toString().trim() === '') return '<span class="empty">Non renseigné</span>';
+    return v;
+  }
+
+  function renderDetail(c, key) {
+    const initials = ((c.prenom?.[0] || '') + (c.nom?.[0] || '')).toUpperCase() || '?';
+    const intakeDone = c.intakeCompleted;
+    const appts = (c.appointments || []).slice().reverse();
+    const notes = c.notes || [];
+
+    const apptHTML = appts.length
+      ? appts.map(a => `<div class="appt-item"><span class="appt-item__date">📅 ${a.date} à ${a.heure}</span><span class="appt-item__dur">${a.duree} min</span></div>`).join('')
+      : '<p style="color:var(--muted);font-size:0.85rem;">Aucun rendez-vous enregistré.</p>';
+
+    const notesHTML = notes.length
+      ? notes.map((n, i) => `<div class="note-item"><div class="note-item__date">${n.date}</div><div class="note-item__text">${n.texte}</div><button class="note-item__del" onclick="deleteNote('${key}', ${i})" title="Supprimer">🗑</button></div>`).join('')
+      : '<p style="color:var(--muted);font-size:0.85rem;margin-bottom:12px;">Aucune note pour ce client.</p>';
+
+    document.getElementById('detailContent').innerHTML = `
+      <div class="detail__header">
+        <div class="detail__avatar">${initials}</div>
+        <div>
+          <div class="detail__name">${c.prenom || ''} ${c.nom || ''}</div>
+          <div class="detail__email">${c.courriel || ''}</div>
+        </div>
+        <span class="intake-badge ${intakeDone ? 'done' : 'pending'}">${intakeDone ? '✓ Dossier santé complété' : '⏳ Dossier santé en attente'}</span>
+      </div>
+
+      <p class="section-title">Informations de contact</p>
+      <div class="info-grid">
+        <div class="info-block"><div class="info-block__label">Téléphone</div><div class="info-block__value ${!c.telephone ? 'empty' : ''}">${val(c.telephone)}</div></div>
+        <div class="info-block"><div class="info-block__label">Date de naissance</div><div class="info-block__value ${!c.dateNaissance ? 'empty' : ''}">${val(c.dateNaissance)}</div></div>
+        <div class="info-block"><div class="info-block__label">Courriel</div><div class="info-block__value">${c.courriel || ''}</div></div>
+        <div class="info-block"><div class="info-block__label">Client depuis</div><div class="info-block__value">${c.createdAt ? new Date(c.createdAt).toLocaleDateString('fr-CA') : '—'}</div></div>
+      </div>
+
+      <p class="section-title" style="margin-top:20px;">Informations de santé</p>
+      <div class="section-card">
+        ${intakeDone ? `
+          <div class="health-field"><div class="health-field__label">Allergies</div><div class="health-field__value ${!c.allergies ? 'empty' : ''}">${val(c.allergies)}</div></div>
+          <div class="health-field"><div class="health-field__label">Conditions médicales</div><div class="health-field__value ${!c.conditionsMedicales ? 'empty' : ''}">${val(c.conditionsMedicales)}</div></div>
+          <div class="health-field"><div class="health-field__label">Médicaments</div><div class="health-field__value ${!c.medicaments ? 'empty' : ''}">${val(c.medicaments)}</div></div>
+          <div class="health-field"><div class="health-field__label">Contre-indications</div><div class="health-field__value ${!c.contreIndications ? 'empty' : ''}">${val(c.contreIndications)}</div></div>
+          <div class="health-field"><div class="health-field__label">Blessures / Cicatrices</div><div class="health-field__value ${!c.blessures ? 'empty' : ''}">${val(c.blessures)}</div></div>
+          <div class="health-field"><div class="health-field__label">Autres informations</div><div class="health-field__value ${!c.autresInfos ? 'empty' : ''}">${val(c.autresInfos)}</div></div>
+        ` : `<p style="color:var(--muted);font-size:0.88rem;">Le client n'a pas encore rempli son questionnaire santé.</p>`}
+      </div>
+
+      <p class="section-title" style="margin-top:20px;">Historique des rendez-vous (${appts.length})</p>
+      <div class="section-card">
+        <div class="appt-list">${apptHTML}</div>
+      </div>
+
+      <p class="section-title" style="margin-top:20px;">Notes de séance</p>
+      <div class="section-card">
+        <div class="notes-list" id="notesList">${notesHTML}</div>
+        <div class="add-note-form">
+          <textarea id="newNoteText" placeholder="Ajouter une note de séance…"></textarea>
+          <div class="add-note-row">
+            <input type="date" id="newNoteDate" value="${new Date().toISOString().slice(0,10)}" />
+            <button class="btn-small" id="addNoteBtn" onclick="addNote('${key}')">+ Ajouter</button>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  async function addNote(key) {
+    const texte = document.getElementById('newNoteText').value.trim();
+    const date = document.getElementById('newNoteDate').value;
+    if (!texte) return;
+    const btn = document.getElementById('addNoteBtn');
+    btn.disabled = true;
+    try {
+      const res = await fetch(`${API}/admin-client-update`, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token, key, action: 'add-note', texte, date }),
+      });
+      if (!res.ok) throw new Error();
+      await selectClient(key);
+    } catch { alert('Erreur lors de l\'enregistrement.'); btn.disabled = false; }
+  }
+
+  async function deleteNote(key, index) {
+    if (!confirm('Supprimer cette note ?')) return;
+    try {
+      await fetch(`${API}/admin-client-update`, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token, key, action: 'delete-note', index }),
+      });
+      await selectClient(key);
+    } catch { alert('Erreur.'); }
+  }
+
+  // ===== INIT =====
+  if (isLoggedIn()) {
+    showDashboard();
+  } else {
+    showLogin();
+  }
+</script>
+</body>
+</html>
