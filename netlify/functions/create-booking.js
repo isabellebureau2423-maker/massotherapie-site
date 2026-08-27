@@ -1,7 +1,7 @@
 ﻿const crypto = require('crypto');
 const { google } = require('googleapis');
 const nodemailer = require('nodemailer');
-const { getStore } = require('@netlify/blobs');
+const { getStore } = require('./_blobs');
 
 const CORS_HEADERS = {
   'Access-Control-Allow-Origin': '*',

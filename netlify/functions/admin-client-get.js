@@ -1,5 +1,5 @@
 const crypto = require('crypto');
-const { getStore } = require('@netlify/blobs');
+const { getStore } = require('./_blobs');
 
 const CORS = {
   'Access-Control-Allow-Origin': '*',
