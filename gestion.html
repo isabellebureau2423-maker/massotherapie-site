@@ -436,6 +436,7 @@
       <div class="section-card" id="infoEdit" style="display:none;">
         <div class="health-field"><div class="health-field__label">Prénom</div><input id="ci_prenom" type="text" value="${(c.prenom || '').replace(/"/g, '&quot;')}" style="width:100%;padding:8px 12px;background:rgba(255,255,255,0.06);border:1.5px solid var(--border);border-radius:8px;color:var(--text);font-family:inherit;font-size:0.88rem;" /></div>
         <div class="health-field"><div class="health-field__label">Nom</div><input id="ci_nom" type="text" value="${(c.nom || '').replace(/"/g, '&quot;')}" style="width:100%;padding:8px 12px;background:rgba(255,255,255,0.06);border:1.5px solid var(--border);border-radius:8px;color:var(--text);font-family:inherit;font-size:0.88rem;" /></div>
+        <div class="health-field"><div class="health-field__label">Courriel</div><input id="ci_courriel" type="email" value="${(c.courriel || '').replace(/"/g, '&quot;')}" style="width:100%;padding:8px 12px;background:rgba(255,255,255,0.06);border:1.5px solid var(--border);border-radius:8px;color:var(--text);font-family:inherit;font-size:0.88rem;" /></div>
         <div class="health-field"><div class="health-field__label">Téléphone</div><input id="ci_telephone" type="tel" value="${(c.telephone || '').replace(/"/g, '&quot;')}" style="width:100%;padding:8px 12px;background:rgba(255,255,255,0.06);border:1.5px solid var(--border);border-radius:8px;color:var(--text);font-family:inherit;font-size:0.88rem;" /></div>
         <div class="health-field"><div class="health-field__label">Date de naissance</div><input id="ci_dateNaissance" type="date" value="${c.dateNaissance || ''}" style="width:100%;padding:8px 12px;background:rgba(255,255,255,0.06);border:1.5px solid var(--border);border-radius:8px;color:var(--text);font-family:inherit;font-size:0.88rem;" /></div>
         <div class="health-field"><div class="health-field__label">Adresse</div><input id="ci_adresse" type="text" value="${(c.adresse || '').replace(/"/g, '&quot;')}" placeholder="Ex : 123 rue Principale, Saint-Rémi" style="width:100%;padding:8px 12px;background:rgba(255,255,255,0.06);border:1.5px solid var(--border);border-radius:8px;color:var(--text);font-family:inherit;font-size:0.88rem;" /></div>
@@ -550,13 +551,17 @@
           token, key, action: 'update-info',
           prenom: document.getElementById('ci_prenom').value.trim(),
           nom: document.getElementById('ci_nom').value.trim(),
+          courriel: document.getElementById('ci_courriel').value.trim(),
           telephone: document.getElementById('ci_telephone').value.trim(),
           dateNaissance: document.getElementById('ci_dateNaissance').value,
           adresse: document.getElementById('ci_adresse').value.trim(),
         }),
       });
       if (!res.ok) throw new Error();
-      await selectClient(key);
+      const data = await res.json();
+      await loadClients();
+      // Si le courriel a changé, le key a changé aussi
+      await selectClient(data.newKey || key);
     } catch { alert('Erreur lors de l\'enregistrement.'); btn.disabled = false; btn.textContent = '💾 Enregistrer'; }
   }
 

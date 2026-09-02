@@ -45,6 +45,21 @@ exports.handler = async (event) => {
     } else if (action === 'update-info') {
       const allowed = ['prenom', 'nom', 'dateNaissance', 'telephone', 'adresse'];
       allowed.forEach(f => { if (body[f] !== undefined) data[f] = body[f]; });
+      // Courriel change → renommer la clé
+      if (body.courriel) {
+        const newKey = body.courriel.toLowerCase().trim();
+        if (newKey !== key) {
+          if (!newKey.includes('@')) return { statusCode: 400, headers: CORS, body: JSON.stringify({ error: 'Courriel invalide' }) };
+          const existing = await store.get(newKey, { type: 'json' });
+          if (existing) return { statusCode: 409, headers: CORS, body: JSON.stringify({ error: 'Ce courriel est déjà utilisé par un autre client' }) };
+          data.courriel = newKey;
+          data.updatedAt = new Date().toISOString();
+          await store.setJSON(newKey, data);
+          await store.delete(key);
+          return { statusCode: 200, headers: CORS, body: JSON.stringify({ success: true, newKey }) };
+        }
+        data.courriel = body.courriel.toLowerCase().trim();
+      }
     } else if (action === 'update-health') {
       const allowed = ['allergies', 'conditionsMedicales', 'medicaments', 'contreIndications', 'blessures', 'autresInfos', 'dateNaissance'];
       allowed.forEach(f => { if (body[f] !== undefined) data[f] = body[f]; });
