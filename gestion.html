@@ -421,12 +421,28 @@
         <button class="btn-danger" onclick="deleteClient('${key}')">🗑 Supprimer</button>
       </div>
 
-      <p class="section-title">Informations de contact</p>
-      <div class="info-grid">
-        <div class="info-block"><div class="info-block__label">Téléphone</div><div class="info-block__value ${!c.telephone ? 'empty' : ''}">${val(c.telephone)}</div></div>
-        <div class="info-block"><div class="info-block__label">Date de naissance</div><div class="info-block__value ${!c.dateNaissance ? 'empty' : ''}">${val(c.dateNaissance)}</div></div>
-        <div class="info-block"><div class="info-block__label">Courriel</div><div class="info-block__value">${c.courriel || ''}</div></div>
-        <div class="info-block"><div class="info-block__label">Client depuis</div><div class="info-block__value">${c.createdAt ? new Date(c.createdAt).toLocaleDateString('fr-CA') : '—'}</div></div>
+      <p class="section-title" style="display:flex;justify-content:space-between;align-items:center;">
+        Informations de contact
+        <button class="btn-small" id="toggleInfoBtn" style="font-size:0.75rem;padding:5px 14px;" onclick="toggleInfoEdit('${key}')">✏️ Modifier</button>
+      </p>
+      <div id="infoView">
+        <div class="info-grid">
+          <div class="info-block"><div class="info-block__label">Téléphone</div><div class="info-block__value ${!c.telephone ? 'empty' : ''}">${val(c.telephone)}</div></div>
+          <div class="info-block"><div class="info-block__label">Date de naissance</div><div class="info-block__value ${!c.dateNaissance ? 'empty' : ''}">${val(c.dateNaissance)}</div></div>
+          <div class="info-block"><div class="info-block__label">Courriel</div><div class="info-block__value">${c.courriel || ''}</div></div>
+          <div class="info-block"><div class="info-block__label">Adresse</div><div class="info-block__value ${!c.adresse ? 'empty' : ''}">${val(c.adresse)}</div></div>
+        </div>
+      </div>
+      <div class="section-card" id="infoEdit" style="display:none;">
+        <div class="health-field"><div class="health-field__label">Prénom</div><input id="ci_prenom" type="text" value="${(c.prenom || '').replace(/"/g, '&quot;')}" style="width:100%;padding:8px 12px;background:rgba(255,255,255,0.06);border:1.5px solid var(--border);border-radius:8px;color:var(--text);font-family:inherit;font-size:0.88rem;" /></div>
+        <div class="health-field"><div class="health-field__label">Nom</div><input id="ci_nom" type="text" value="${(c.nom || '').replace(/"/g, '&quot;')}" style="width:100%;padding:8px 12px;background:rgba(255,255,255,0.06);border:1.5px solid var(--border);border-radius:8px;color:var(--text);font-family:inherit;font-size:0.88rem;" /></div>
+        <div class="health-field"><div class="health-field__label">Téléphone</div><input id="ci_telephone" type="tel" value="${(c.telephone || '').replace(/"/g, '&quot;')}" style="width:100%;padding:8px 12px;background:rgba(255,255,255,0.06);border:1.5px solid var(--border);border-radius:8px;color:var(--text);font-family:inherit;font-size:0.88rem;" /></div>
+        <div class="health-field"><div class="health-field__label">Date de naissance</div><input id="ci_dateNaissance" type="date" value="${c.dateNaissance || ''}" style="width:100%;padding:8px 12px;background:rgba(255,255,255,0.06);border:1.5px solid var(--border);border-radius:8px;color:var(--text);font-family:inherit;font-size:0.88rem;" /></div>
+        <div class="health-field"><div class="health-field__label">Adresse</div><input id="ci_adresse" type="text" value="${(c.adresse || '').replace(/"/g, '&quot;')}" placeholder="Ex : 123 rue Principale, Saint-Rémi" style="width:100%;padding:8px 12px;background:rgba(255,255,255,0.06);border:1.5px solid var(--border);border-radius:8px;color:var(--text);font-family:inherit;font-size:0.88rem;" /></div>
+        <div style="display:flex;gap:10px;margin-top:16px;">
+          <button class="btn-cancel" onclick="toggleInfoEdit('${key}')">Annuler</button>
+          <button class="btn-small" id="saveInfoBtn" onclick="saveInfo('${key}')" style="flex:1;padding:12px;font-size:0.95rem;">💾 Enregistrer</button>
+        </div>
       </div>
 
       <p class="section-title" style="margin-top:20px;display:flex;justify-content:space-between;align-items:center;">
@@ -505,6 +521,43 @@
       });
       await selectClient(key);
     } catch { alert('Erreur.'); }
+  }
+
+  // ===== CONTACT EDIT =====
+  function toggleInfoEdit(key) {
+    const view = document.getElementById('infoView');
+    const edit = document.getElementById('infoEdit');
+    const btn = document.getElementById('toggleInfoBtn');
+    if (edit.style.display === 'none') {
+      view.style.display = 'none';
+      edit.style.display = 'block';
+      if (btn) btn.textContent = '✕ Annuler';
+      setTimeout(() => edit.scrollIntoView({ behavior: 'smooth', block: 'start' }), 50);
+    } else {
+      edit.style.display = 'none';
+      view.style.display = 'block';
+      if (btn) btn.textContent = '✏️ Modifier';
+    }
+  }
+
+  async function saveInfo(key) {
+    const btn = document.getElementById('saveInfoBtn');
+    btn.disabled = true; btn.textContent = 'Enregistrement…';
+    try {
+      const res = await fetch(`${API}/admin-client-update`, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          token, key, action: 'update-info',
+          prenom: document.getElementById('ci_prenom').value.trim(),
+          nom: document.getElementById('ci_nom').value.trim(),
+          telephone: document.getElementById('ci_telephone').value.trim(),
+          dateNaissance: document.getElementById('ci_dateNaissance').value,
+          adresse: document.getElementById('ci_adresse').value.trim(),
+        }),
+      });
+      if (!res.ok) throw new Error();
+      await selectClient(key);
+    } catch { alert('Erreur lors de l\'enregistrement.'); btn.disabled = false; btn.textContent = '💾 Enregistrer'; }
   }
 
   // ===== SANTÉ EDIT =====

@@ -43,7 +43,7 @@ exports.handler = async (event) => {
     } else if (action === 'delete-note') {
       if (data.notes && body.index >= 0) data.notes.splice(body.index, 1);
     } else if (action === 'update-info') {
-      const allowed = ['dateNaissance', 'telephone', 'adresse'];
+      const allowed = ['prenom', 'nom', 'dateNaissance', 'telephone', 'adresse'];
       allowed.forEach(f => { if (body[f] !== undefined) data[f] = body[f]; });
     } else if (action === 'update-health') {
       const allowed = ['allergies', 'conditionsMedicales', 'medicaments', 'contreIndications', 'blessures', 'autresInfos', 'dateNaissance'];
