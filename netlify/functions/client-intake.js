@@ -42,7 +42,7 @@ exports.handler = async (event) => {
     try { body = JSON.parse(event.body || '{}'); }
     catch { return { statusCode: 400, headers: CORS, body: JSON.stringify({ error: 'JSON invalide' }) }; }
 
-    const fields = ['dateNaissance', 'allergies', 'conditionsMedicales', 'medicaments', 'contreIndications', 'blessures', 'autresInfos'];
+    const fields = ['dateNaissance', 'allergies', 'conditionsMedicales', 'medicaments', 'contreIndications', 'blessures', 'autresInfos', 'activites', 'pression'];
     fields.forEach(f => { if (body[f] !== undefined) found.data[f] = body[f]; });
     found.data.intakeCompleted = true;
     found.data.intakeCompletedAt = new Date().toISOString();

@@ -61,7 +61,7 @@ exports.handler = async (event) => {
         data.courriel = body.courriel.toLowerCase().trim();
       }
     } else if (action === 'update-health') {
-      const allowed = ['allergies', 'conditionsMedicales', 'medicaments', 'contreIndications', 'blessures', 'autresInfos', 'dateNaissance'];
+      const allowed = ['allergies', 'conditionsMedicales', 'medicaments', 'contreIndications', 'blessures', 'autresInfos', 'dateNaissance', 'activites', 'pression'];
       allowed.forEach(f => { if (body[f] !== undefined) data[f] = body[f]; });
       data.intakeCompleted = true;
     }

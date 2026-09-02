@@ -459,6 +459,8 @@
           <div class="health-field"><div class="health-field__label">Contre-indications</div><div class="health-field__value ${!c.contreIndications ? 'empty' : ''}">${val(c.contreIndications)}</div></div>
           <div class="health-field"><div class="health-field__label">Blessures / Cicatrices</div><div class="health-field__value ${!c.blessures ? 'empty' : ''}">${val(c.blessures)}</div></div>
           <div class="health-field"><div class="health-field__label">Autres informations</div><div class="health-field__value ${!c.autresInfos ? 'empty' : ''}">${val(c.autresInfos)}</div></div>
+          <div class="health-field"><div class="health-field__label">Activités physiques</div><div class="health-field__value ${!c.activites ? 'empty' : ''}">${val(c.activites)}</div></div>
+          <div class="health-field"><div class="health-field__label">Pression préférée</div><div class="health-field__value ${!c.pression ? 'empty' : ''}">${val(c.pression)}</div></div>
         ` : `<p style="color:var(--muted);font-size:0.88rem;">Cliquez sur <strong style="color:var(--gold)">✏️ Remplir / Modifier</strong> pour saisir les informations santé de ce client.</p>`}
       </div>
       <div class="section-card" id="healthEdit" style="display:none;">
@@ -472,6 +474,13 @@
         <div class="health-field"><div class="health-field__label">Contre-indications</div><textarea id="he_contreIndications" rows="3" style="width:100%;padding:8px 12px;background:rgba(255,255,255,0.06);border:1.5px solid var(--border);border-radius:8px;color:var(--text);font-family:inherit;font-size:0.88rem;resize:vertical;">${c.contreIndications || ''}</textarea></div>
         <div class="health-field"><div class="health-field__label">Blessures / Cicatrices</div><textarea id="he_blessures" rows="3" style="width:100%;padding:8px 12px;background:rgba(255,255,255,0.06);border:1.5px solid var(--border);border-radius:8px;color:var(--text);font-family:inherit;font-size:0.88rem;resize:vertical;">${c.blessures || ''}</textarea></div>
         <div class="health-field"><div class="health-field__label">Autres informations</div><textarea id="he_autresInfos" rows="3" style="width:100%;padding:8px 12px;background:rgba(255,255,255,0.06);border:1.5px solid var(--border);border-radius:8px;color:var(--text);font-family:inherit;font-size:0.88rem;resize:vertical;">${c.autresInfos || ''}</textarea></div>
+        <div class="health-field"><div class="health-field__label">Activités physiques</div><textarea id="he_activites" rows="3" placeholder="Ex : natation 3x/semaine, yoga, marche quotidienne, aucune…" style="width:100%;padding:8px 12px;background:rgba(255,255,255,0.06);border:1.5px solid var(--border);border-radius:8px;color:var(--text);font-family:inherit;font-size:0.88rem;resize:vertical;">${c.activites || ''}</textarea></div>
+        <div class="health-field">
+          <div class="health-field__label">Pression préférée</div>
+          <div style="display:flex;gap:10px;margin-top:6px;">
+            ${['Légère','Moyenne','Forte'].map(p => `<label style="display:flex;align-items:center;gap:8px;cursor:pointer;flex:1;background:rgba(255,255,255,0.04);border:1.5px solid ${c.pression===p?'var(--accent)':'var(--border)'};border-radius:8px;padding:10px 12px;font-size:0.85rem;"><input type="radio" name="he_pression" value="${p}" ${c.pression===p?'checked':''} style="accent-color:var(--accent);" />${p}</label>`).join('')}
+          </div>
+        </div>
         <div style="display:flex;gap:10px;margin-top:20px;position:sticky;bottom:0;background:var(--card);padding:14px 0 4px;">
           <button class="btn-cancel" onclick="toggleHealthEdit('${key}')">Annuler</button>
           <button class="btn-small" id="saveHealthBtn" onclick="saveHealth('${key}')" style="flex:1;padding:12px;font-size:0.95rem;">💾 Enregistrer</button>
@@ -597,6 +606,8 @@
           contreIndications: document.getElementById('he_contreIndications').value.trim(),
           blessures: document.getElementById('he_blessures').value.trim(),
           autresInfos: document.getElementById('he_autresInfos').value.trim(),
+          activites: document.getElementById('he_activites').value.trim(),
+          pression: (document.querySelector('input[name="he_pression"]:checked') || {}).value || '',
         }),
       });
       if (!res.ok) throw new Error();

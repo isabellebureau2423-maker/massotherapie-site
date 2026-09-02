@@ -110,6 +110,32 @@
         <textarea id="autresInfos" placeholder="Ex : zones à éviter, préférences, douleurs chroniques, objectifs de la séance…"></textarea>
       </div>
 
+      <div class="card">
+        <h2>🏃 Activités physiques</h2>
+        <label>Quelles activités physiques pratiquez-vous régulièrement ?</label>
+        <textarea id="activites" placeholder="Ex : natation 3x/semaine, yoga, marche quotidienne, aucune…"></textarea>
+        <p class="hint">Fréquence et type d'activité aident à adapter la séance à votre condition physique</p>
+      </div>
+
+      <div class="card">
+        <h2>🤲 Pression préférée</h2>
+        <p style="font-size:0.88rem;color:#3A5E50;margin-bottom:16px;">Quelle intensité de pression préférez-vous lors de vos massages ?</p>
+        <div style="display:flex;flex-direction:column;gap:12px;">
+          <label style="display:flex;align-items:center;gap:12px;cursor:pointer;margin:0;font-weight:400;color:#1A2E25;background:#fafcfb;border:1.5px solid #c8ddd5;border-radius:10px;padding:14px 16px;transition:border-color 0.2s;" id="lbl_legere">
+            <input type="radio" name="pression" id="pression_legere" value="Légère" style="width:18px;height:18px;accent-color:#2A5446;flex-shrink:0;" />
+            <span><strong>Légère</strong> — toucher doux, relaxant, idéal pour la détente</span>
+          </label>
+          <label style="display:flex;align-items:center;gap:12px;cursor:pointer;margin:0;font-weight:400;color:#1A2E25;background:#fafcfb;border:1.5px solid #c8ddd5;border-radius:10px;padding:14px 16px;transition:border-color 0.2s;" id="lbl_moyenne">
+            <input type="radio" name="pression" id="pression_moyenne" value="Moyenne" style="width:18px;height:18px;accent-color:#2A5446;flex-shrink:0;" />
+            <span><strong>Moyenne</strong> — pression modérée, bon équilibre détente et travail musculaire</span>
+          </label>
+          <label style="display:flex;align-items:center;gap:12px;cursor:pointer;margin:0;font-weight:400;color:#1A2E25;background:#fafcfb;border:1.5px solid #c8ddd5;border-radius:10px;padding:14px 16px;transition:border-color 0.2s;" id="lbl_forte">
+            <input type="radio" name="pression" id="pression_forte" value="Forte" style="width:18px;height:18px;accent-color:#2A5446;flex-shrink:0;" />
+            <span><strong>Forte</strong> — travail en profondeur, dénouer les tensions musculaires</span>
+          </label>
+        </div>
+      </div>
+
       <button type="submit" class="btn-submit" id="submitBtn">Envoyer mon dossier santé</button>
     </form>
   </div>
@@ -158,6 +184,8 @@
       contreIndications: document.getElementById('contreIndications').value.trim(),
       blessures: document.getElementById('blessures').value.trim(),
       autresInfos: document.getElementById('autresInfos').value.trim(),
+      activites: document.getElementById('activites').value.trim(),
+      pression: (document.querySelector('input[name="pression"]:checked') || {}).value || '',
     };
 
     try {
