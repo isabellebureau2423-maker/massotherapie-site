@@ -193,6 +193,13 @@
       transition: background 0.15s;
     }
     .btn-new-client:hover { background: rgba(212,175,90,0.2); }
+    .pression-btn {
+      flex: 1; padding: 10px 8px; background: rgba(255,255,255,0.04); border: 1.5px solid var(--border);
+      border-radius: 8px; color: var(--muted); cursor: pointer; font-family: inherit; font-size: 0.85rem;
+      font-weight: 500; transition: all 0.15s; text-align: center;
+    }
+    .pression-btn:hover { border-color: rgba(255,255,255,0.2); color: var(--text); }
+    .pression-btn.selected { border-color: var(--accent); background: rgba(42,84,70,0.25); color: var(--text); font-weight: 600; }
     .btn-danger {
       padding: 6px 14px; background: transparent; color: #f08080; border: 1px solid rgba(240,128,128,0.35);
       border-radius: 100px; font-size: 0.8rem; font-weight: 600; cursor: pointer; transition: background 0.2s;
@@ -478,8 +485,9 @@
         <div class="health-field">
           <div class="health-field__label">Pression préférée</div>
           <div style="display:flex;gap:10px;margin-top:6px;">
-            ${['Légère','Moyenne','Forte'].map(p => `<label style="display:flex;align-items:center;gap:8px;cursor:pointer;flex:1;background:rgba(255,255,255,0.04);border:1.5px solid ${c.pression===p?'var(--accent)':'var(--border)'};border-radius:8px;padding:10px 12px;font-size:0.85rem;"><input type="radio" name="he_pression" value="${p}" ${c.pression===p?'checked':''} style="accent-color:var(--accent);" />${p}</label>`).join('')}
+            ${['Légère','Moyenne','Forte'].map(p => `<button type="button" class="pression-btn${c.pression===p?' selected':''}" onclick="selectPression(this)">${p}</button>`).join('')}
           </div>
+          <input type="hidden" id="he_pression" value="${c.pression || ''}" />
         </div>
         <div style="display:flex;gap:10px;margin-top:20px;position:sticky;bottom:0;background:var(--card);padding:14px 0 4px;">
           <button class="btn-cancel" onclick="toggleHealthEdit('${key}')">Annuler</button>
@@ -607,7 +615,7 @@
           blessures: document.getElementById('he_blessures').value.trim(),
           autresInfos: document.getElementById('he_autresInfos').value.trim(),
           activites: document.getElementById('he_activites').value.trim(),
-          pression: (document.querySelector('input[name="he_pression"]:checked') || {}).value || '',
+          pression: document.getElementById('he_pression').value,
         }),
       });
       if (!res.ok) throw new Error();
@@ -660,6 +668,13 @@
       await loadClients();
       selectClient(courriel.toLowerCase().trim());
     } catch { errEl.textContent = 'Erreur réseau. Réessayez.'; errEl.style.display = 'block'; btn.disabled = false; btn.textContent = 'Créer le dossier'; }
+  }
+
+  // ===== PRESSION =====
+  function selectPression(btn) {
+    btn.closest('div').querySelectorAll('.pression-btn').forEach(b => b.classList.remove('selected'));
+    btn.classList.add('selected');
+    document.getElementById('he_pression').value = btn.textContent;
   }
 
   // ===== SUPPRIMER CLIENT =====
