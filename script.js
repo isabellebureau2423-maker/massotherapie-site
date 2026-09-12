@@ -78,11 +78,11 @@ if (scrollTopBtn) {
 
   const JOURS = ['Dimanche','Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi'];
   const MOIS  = ['janvier','f\u00e9vrier','mars','avril','mai','juin','juillet','ao\u00fbt','septembre','octobre','novembre','d\u00e9cembre'];
-  const SLOTS_SEMAINE = ['8h00','9h30','11h00','12h30','14h00','15h30'];
-  const SLOTS_WEEKEND = ['9h00','10h30','12h00','13h30','14h30'];
+  const SLOTS_VENDREDI = ['9h00','10h30','12h00','13h30','15h00'];
+  const SLOTS_DIMANCHE = ['9h00','10h30','12h00','13h30','14h30'];
 
-  // R\u00e9f\u00e9rence : samedi 21 juin 2026 = 1er weekend disponible
-  const REF_SAT = new Date(2026, 5, 21);
+  // R\u00e9f\u00e9rence : dimanche 22 juin 2026 = 1er dimanche disponible
+  const REF_DIM = new Date(2026, 5, 22);
 
   const today = new Date();
   today.setHours(0, 0, 0, 0);
@@ -93,13 +93,13 @@ if (scrollTopBtn) {
   const lundi = new Date(today);
   lundi.setDate(today.getDate() + diffLundi);
 
-  // Jours affich\u00e9s : lun(+0), mar(+1), mer(+2), sam(+5), dim(+6)
-  const offsets = [0, 1, 2, 5, 6];
+  // Jours affich\u00e9s : ven(+4), dim(+6)
+  const offsets = [4, 6];
   const jours = offsets.map(o => { const d = new Date(lundi); d.setDate(lundi.getDate() + o); return d; });
 
-  // Weekend dispo ? (alternance depuis REF_SAT)
+  // Dimanche dispo ? (alternance depuis REF_DIM)
   const msWeek = 7 * 24 * 60 * 60 * 1000;
-  const semDiff = Math.round((jours[3] - REF_SAT) / msWeek);
+  const semDiff = Math.round((jours[1] - REF_DIM) / msWeek);
   const weekendDispo = semDiff % 2 === 0;
 
   function toAPI(h) {
@@ -120,14 +120,14 @@ if (scrollTopBtn) {
   }));
 
   grid.innerHTML = jours.map((d, i) => {
-    const isWE = i >= 3;
-    const dispo = isWE ? weekendDispo : true;
+    const isDim = i === 1;
+    const dispo = isDim ? weekendDispo : true;
     const nom = JOURS[d.getDay()];
     const date = d.getDate() + ' ' + MOIS[d.getMonth()];
     if (!dispo) {
       return `<div class="plage plage--ferme"><div class="plage__jour">${nom}</div><div class="plage__date">${date}</div><div class="plage__ferme-label">Ferm\u00e9</div></div>`;
     }
-    const slots = isWE ? SLOTS_WEEKEND : SLOTS_SEMAINE;
+    const slots = isDim ? SLOTS_DIMANCHE : SLOTS_VENDREDI;
     const avail = results[i];
     const slotsHTML = slots.map(s => {
       const available = avail[toAPI(s)] !== false;
