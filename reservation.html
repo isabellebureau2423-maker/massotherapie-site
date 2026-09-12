@@ -312,10 +312,10 @@
     // ===== CALENDAR STATE =====
     const MONTHS_FR = ['Janvier','Février','Mars','Avril','Mai','Juin',
                        'Juillet','Août','Septembre','Octobre','Novembre','Décembre'];
-    const ALLOWED_DAYS = new Set([0, 1, 2, 3, 6]); // Di Lu Ma Me Sa
+    const ALLOWED_DAYS = new Set([0, 5]); // Di Ven
 
-    // Référence : samedi 20 juin 2026 = 1er weekend disponible
-    const REF_SAT_WE = new Date(2026, 5, 20);
+    // Référence : dimanche 22 juin 2026 = 1er dimanche disponible
+    const REF_SAT_WE = new Date(2026, 5, 22);
     const MS_WEEK = 7 * 24 * 60 * 60 * 1000;
 
     const now = new Date();
@@ -350,14 +350,14 @@
     function isDisabled(date) {
       const dow = date.getDay();
       if (!ALLOWED_DAYS.has(dow)) return true;
-      if (dow === 0 || dow === 6) {
+      if (dow === 0) {
+        // Dimanche : un sur deux
         if (!isWeekendDispo(date)) return true;
-        // Weekend: last slot 14h30 (14h30 + 90min = 16h00)
         const lastSlot = new Date(date.getFullYear(), date.getMonth(), date.getDate(), 14, 30, 0);
         return lastSlot - new Date() < MIN_HOURS_ADVANCE * 3600 * 1000;
       }
-      // Semaine: last slot 15h30 (15h30 + 90min = 17h00)
-      const lastSlot = new Date(date.getFullYear(), date.getMonth(), date.getDate(), 15, 30, 0);
+      // Vendredi: last slot 15h00 (15h00 + 90min = 16h30)
+      const lastSlot = new Date(date.getFullYear(), date.getMonth(), date.getDate(), 15, 0, 0);
       return lastSlot - new Date() < MIN_HOURS_ADVANCE * 3600 * 1000;
     }
 
