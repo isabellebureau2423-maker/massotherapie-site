@@ -93,13 +93,14 @@ if (scrollTopBtn) {
   const lundi = new Date(today);
   lundi.setDate(today.getDate() + diffLundi);
 
-  // Jours affich\u00e9s : jeu(+3), dim(+6)
-  const offsets = [3, 6];
+  // Tous les jours de la semaine : lun(+0) \u00e0 dim(+6)
+  const offsets = [0, 1, 2, 3, 4, 5, 6];
   const jours = offsets.map(o => { const d = new Date(lundi); d.setDate(lundi.getDate() + o); return d; });
 
   // Dimanche dispo ? (alternance depuis REF_DIM)
   const msWeek = 7 * 24 * 60 * 60 * 1000;
-  const semDiff = Math.round((jours[1] - REF_DIM) / msWeek);
+  const dimanche = jours[6];
+  const semDiff = Math.round((dimanche - REF_DIM) / msWeek);
   const weekendDispo = semDiff % 2 === 0;
 
   function toAPI(h) {
@@ -110,7 +111,10 @@ if (scrollTopBtn) {
     return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
   }
 
-  const results = await Promise.all(jours.map(async d => {
+  // Jours actifs : jeudi(index 3) et dimanche(index 6)
+  const joursActifs = [3, 6];
+  const results = await Promise.all(jours.map(async (d, i) => {
+    if (!joursActifs.includes(i)) return {};
     try {
       const res = await fetch(`/.netlify/functions/get-availability?date=${dateStr(d)}&duree=60&t=${Date.now()}`, { cache: 'no-store' });
       const data = await res.json();
@@ -120,11 +124,16 @@ if (scrollTopBtn) {
   }));
 
   grid.innerHTML = jours.map((d, i) => {
-    const isDim = i === 1;
-    const dispo = isDim ? weekendDispo : true;
     const nom = JOURS[d.getDay()];
     const date = d.getDate() + ' ' + MOIS[d.getMonth()];
-    if (!dispo) {
+    const isJeudi = i === 3;
+    const isDim   = i === 6;
+    // Jours ferm\u00e9s : gris\u00e9s
+    if (!isJeudi && !isDim) {
+      return `<div class="plage plage--ferme"><div class="plage__jour">${nom}</div><div class="plage__date">${date}</div><div class="plage__ferme-label">Ferm\u00e9</div></div>`;
+    }
+    // Dimanche ferm\u00e9 cette semaine
+    if (isDim && !weekendDispo) {
       return `<div class="plage plage--ferme"><div class="plage__jour">${nom}</div><div class="plage__date">${date}</div><div class="plage__ferme-label">Ferm\u00e9</div></div>`;
     }
     const slots = isDim ? SLOTS_DIMANCHE : SLOTS_JEUDI;
