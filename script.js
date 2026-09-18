@@ -78,7 +78,7 @@ if (scrollTopBtn) {
 
   const JOURS = ['Dimanche','Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi'];
   const MOIS  = ['janvier','f\u00e9vrier','mars','avril','mai','juin','juillet','ao\u00fbt','septembre','octobre','novembre','d\u00e9cembre'];
-  const SLOTS_VENDREDI = ['9h00','10h30','12h00','13h30','15h00'];
+  const SLOTS_JEUDI   = ['9h00','10h30','12h00','13h30'];
   const SLOTS_DIMANCHE = ['9h00','10h30','12h00','13h30','14h30'];
 
   // R\u00e9f\u00e9rence : dimanche 22 juin 2026 = 1er dimanche disponible
@@ -93,8 +93,8 @@ if (scrollTopBtn) {
   const lundi = new Date(today);
   lundi.setDate(today.getDate() + diffLundi);
 
-  // Jours affich\u00e9s : ven(+4), dim(+6)
-  const offsets = [4, 6];
+  // Jours affich\u00e9s : jeu(+3), dim(+6)
+  const offsets = [3, 6];
   const jours = offsets.map(o => { const d = new Date(lundi); d.setDate(lundi.getDate() + o); return d; });
 
   // Dimanche dispo ? (alternance depuis REF_DIM)
@@ -127,7 +127,7 @@ if (scrollTopBtn) {
     if (!dispo) {
       return `<div class="plage plage--ferme"><div class="plage__jour">${nom}</div><div class="plage__date">${date}</div><div class="plage__ferme-label">Ferm\u00e9</div></div>`;
     }
-    const slots = isDim ? SLOTS_DIMANCHE : SLOTS_VENDREDI;
+    const slots = isDim ? SLOTS_DIMANCHE : SLOTS_JEUDI;
     const avail = results[i];
     const slotsHTML = slots.map(s => {
       const available = avail[toAPI(s)] !== false;
