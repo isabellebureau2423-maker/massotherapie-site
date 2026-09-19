@@ -130,11 +130,11 @@ if (scrollTopBtn) {
     const isDim   = i === 6;
     // Jours ferm\u00e9s : gris\u00e9s
     if (!isJeudi && !isDim) {
-      return `<div class="plage plage--ferme"><div class="plage__jour">${nom}</div><div class="plage__date">${date}</div><div class="plage__ferme-label">Ferm\u00e9</div></div>`;
+      return `<div class="plage plage--ferme"><div class="plage__jour">${nom}</div><div class="plage__date">${date}</div><div class="plage__ferme-label">Aucune disponibilit\u00e9</div></div>`;
     }
     // Dimanche ferm\u00e9 cette semaine
     if (isDim && !weekendDispo) {
-      return `<div class="plage plage--ferme"><div class="plage__jour">${nom}</div><div class="plage__date">${date}</div><div class="plage__ferme-label">Ferm\u00e9</div></div>`;
+      return `<div class="plage plage--ferme"><div class="plage__jour">${nom}</div><div class="plage__date">${date}</div><div class="plage__ferme-label">Aucune disponibilit\u00e9</div></div>`;
     }
     const slots = isDim ? SLOTS_DIMANCHE : SLOTS_JEUDI;
     const avail = results[i];
