@@ -314,6 +314,11 @@
                        'Juillet','Août','Septembre','Octobre','Novembre','Décembre'];
     const ALLOWED_DAYS = new Set([0, 4]); // Di Jeu
 
+    // Dates exceptionnelles disponibles (en dehors de l'horaire habituel)
+    const EXTRA_DATES = new Set([
+      '2026-11-21', // Samedi exceptionnel
+    ]);
+
     // Référence : dimanche 22 juin 2026 = 1er dimanche disponible
     const REF_SAT_WE = new Date(2026, 5, 22);
     const MS_WEEK = 7 * 24 * 60 * 60 * 1000;
@@ -349,6 +354,14 @@
 
     function isDisabled(date) {
       const dow = date.getDay();
+      const dateStr = toDateStr(date.getFullYear(), date.getMonth(), date.getDate());
+
+      // Date exceptionnelle : toujours disponible si pas trop tôt
+      if (EXTRA_DATES.has(dateStr)) {
+        const lastSlot = new Date(date.getFullYear(), date.getMonth(), date.getDate(), 14, 30, 0);
+        return lastSlot - new Date() < MIN_HOURS_ADVANCE * 3600 * 1000;
+      }
+
       if (!ALLOWED_DAYS.has(dow)) return true;
       if (dow === 0) {
         // Dimanche : un sur deux
